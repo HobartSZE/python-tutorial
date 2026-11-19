@@ -57,11 +57,11 @@ h1 .grad{background:linear-gradient(100deg,var(--gold2) 10%,#ffdf9e 45%,var(--go
 .btn-ghost{background:transparent;color:var(--txt);border-color:var(--line)}
 .btn-ghost:hover{background:var(--panel2);transform:translateY(-2px)}
 /* Button hover patterns adapted from Uiverse.io Galaxy (MIT), recoloured to this site's gold/hairline system: sweep fill after Cornerstone-04 (chatty-eel-89); sheen pass common Uiverse pattern. */
-.btn-ghost::before{content:"";position:absolute;inset:0;background:rgba(227,168,43,.16);transform:scaleX(0);transform-origin:left;transition:transform .32s cubic-bezier(.22,1,.36,1);z-index:-1}
+.btn-ghost::before{content:"";position:absolute;inset:0;background:rgba(227,168,43,.32);transform:scaleX(0);transform-origin:left;transition:transform .32s cubic-bezier(.22,1,.36,1);z-index:-1}
 .btn-ghost:hover::before{transform:scaleX(1)}
 .btn-ghost:hover{border-color:rgba(245,198,92,.55)}
-.btn-gold::after{content:"";position:absolute;top:0;bottom:0;left:0;width:45%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.38),transparent);transform:translateX(-160%) skewX(-18deg);transition:transform .6s cubic-bezier(.22,1,.36,1);pointer-events:none}
-.btn-gold:hover::after{transform:translateX(260%) skewX(-18deg)}
+.btn-gold::after{content:"";position:absolute;top:0;bottom:0;left:0;width:60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-170%) skewX(-18deg);transition:transform 1s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.btn-gold:hover::after{transform:translateX(240%) skewX(-18deg)}
 .stats{display:flex;gap:clamp(22px,5vw,58px);margin-top:52px;flex-wrap:wrap}
 .stat .n{font-family:var(--grot);font-size:clamp(30px,4vw,44px);font-weight:700;color:var(--txt)}
 .stat .n em{font-style:normal;color:var(--gold)}
@@ -107,8 +107,8 @@ h1 .grad{background:linear-gradient(100deg,var(--gold2) 10%,#ffdf9e 45%,var(--go
 .lsn.current .node{border-color:var(--gold);color:var(--gold2);animation:pulse 2.2s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(227,168,43,.35)}50%{box-shadow:0 0 0 9px rgba(227,168,43,0)}}
 .card{position:relative;border-radius:16px;background:var(--panel);border:1px solid var(--line);padding:20px 22px;cursor:pointer;overflow:hidden;transition:transform .25s ease,border-color .25s,background .25s;will-change:transform}
-.lessons::before{content:"";position:absolute;inset:0;background:radial-gradient(560px circle at var(--rgx,50%) var(--rgy,50%),rgba(245,198,92,.10),transparent 65%);opacity:0;transition:opacity .35s ease;pointer-events:none;z-index:2}
-.lessons.lit::before{opacity:1}
+.glowfield{position:absolute;inset:0;background:radial-gradient(560px circle at var(--rgx,50%) var(--rgy,50%),rgba(245,198,92,.13),transparent 65%);opacity:0;transition:opacity .35s ease;pointer-events:none;z-index:2}
+.lessons.lit .glowfield{opacity:1}
 .card:hover::before{opacity:1}
 .card:hover{border-color:rgba(245,198,92,.4);background:var(--panel2)}
 .card .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -514,7 +514,7 @@ function renderRoute(){
     const dn=items.filter(x=>doneSet.has(x.l.gi)).length;
     const sec=document.createElement('section'); sec.className='stage reveal';
     sec.innerHTML=`<div class="stage-head"><div class="medal">${st.medal}</div><div><h3>阶段${st.medal} · ${stageName(st)}</h3><div class="ss">${stageSub(st)}</div></div><div class="stage-bar"><i style="width:${dn/items.length*100}%"></i></div><div class="stage-pct">${dn}/${items.length}</div></div>
-    <div class="lessons"><div class="fill"></div><div class="drawfill"></div>${items.map(({l,i},k)=>{
+    <div class="lessons"><div class="fill"></div><div class="drawfill"></div><div class="glowfield"></div>${items.map(({l,i},k)=>{
       const d=doneSet.has(l.gi), cur=l.gi===firstOpen();
       return `<div class="lsn reveal ${d?'done':''} ${cur&&!d?'current':''}" style="transition-delay:${(k%6)*55}ms" data-title="${dispTitle(l)}">
         <div class="node">${d?'✓':l.gi+1}</div>
