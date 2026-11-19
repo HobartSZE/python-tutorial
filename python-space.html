@@ -874,7 +874,7 @@ ${srcLine?`<div class="src-line">第 ${line} 行：${esc(srcLine)}</div>`:''}
 <div style="margin-top:8px;color:var(--muted);font-size:13px">原始报错：${esc(String(errStr).split('\n').filter(s=>s.trim()).slice(-1)[0]||'')}</div>`;
 }
 /* ---------- AI tutor (config lives on the Settings view) ---------- */
-const PRESETS=[['OpenAI','https://api.openai.com/v1','gpt-4o-mini'],['DeepSeek','https://api.deepseek.com/v1','deepseek-chat'],['通义千问（兼容模式）','https://dashscope.aliyuncs.com/compatible-mode/v1','qwen-plus'],['Moonshot · Kimi','https://api.moonshot.cn/v1','moonshot-v1-8k'],['智谱 GLM','https://open.bigmodel.cn/api/paas/v4','glm-4-flash'],['硅基流动','https://api.siliconflow.cn/v1','deepseek-ai/DeepSeek-V3'],['自定义','','']];
+const PRESETS=[['OpenAI','https://api.openai.com/v1','gpt-4o-mini'],['DeepSeek','https://api.deepseek.com/v1','deepseek-chat'],['通义千问（兼容模式）','https://dashscope.aliyuncs.com/compatible-mode/v1','qwen-plus'],['Moonshot · Kimi','https://api.moonshot.cn/v1','moonshot-v1-8k'],['智谱 GLM','https://open.bigmodel.cn/api/paas/v4','glm-4-flash'],['硅基流动','https://api.siliconflow.cn','deepseek-ai/DeepSeek-V3'],['自定义','','']];
 let aiCfg=loadJSON(LS_AI, null);
 function aiReady(){ return!!(aiCfg&&aiCfg.key&&aiCfg.base&&aiCfg.model);}
 function fillSettings(){
