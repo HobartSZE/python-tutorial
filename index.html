@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hobart SZE · Python 自学之旅</title>
+<meta name="description" content="41 课 Python 自学路线：从 print 到 pandas 账本报告、Excel、数据清洗与网络爬虫，每课都有代码演示和互动练习。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" as="image" href="textures/earth-day.jpg">
+<script src="assets/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090d; --bg2:#0b0e14; --panel:rgba(255,255,255,.04); --panel2:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.09); --txt:#f2efe7; --muted:#9aa3ad; --muted2:#6b7280;
+  --gold:#e3a82b; --gold2:#f5c65c; --teal:#4cc2a6; --violet:#7a6ff0; --red:#e5604f; --green:#43c465;
+  --serif:'Noto Serif SC',serif; --sans:'Noto Sans SC',sans-serif; --grot:'Space Grotesk','Noto Sans SC',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(227,168,43,.35)}
+a{color:inherit}
+/* ---------- backdrop ---------- */
+.aurora{position:fixed;inset:0;z-index:-3;overflow:hidden;background:radial-gradient(1200px 800px at 80% -10%,#131a29 0%,var(--bg) 55%)}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:drift 26s ease-in-out infinite alternate}
+.aurora i:nth-child(1){width:560px;height:560px;left:-120px;top:-160px;background:radial-gradient(circle,#8a5a12 0%,transparent 65%)}
+.aurora i:nth-child(2){width:640px;height:640px;right:-200px;top:12%;background:radial-gradient(circle,#1d3a5f 0%,transparent 65%);animation-delay:-8s}
+.aurora i:nth-child(3){width:480px;height:480px;left:32%;bottom:-260px;background:radial-gradient(circle,#14332a 0%,transparent 65%);animation-delay:-16s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(60px,40px) scale(1.12)}}
+.grain{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E")}
+/* ---------- nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(14px);background:rgba(7,9,13,.62);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.logo{font-family:var(--grot);font-weight:700;letter-spacing:.14em;font-size:13px}
+.logo b{color:var(--gold)}
+.nav-in .sp{flex:1}
+.ringwrap{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
+.ring{transform:rotate(-90deg)}
+.ring .bgc{stroke:rgba(255,255,255,.12)}
+.ring .fgc{stroke:var(--gold);transition:stroke-dashoffset .8s cubic-bezier(.22,1,.36,1)}
+/* ---------- hero ---------- */
+.hero{max-width:1120px;margin:0 auto;padding:158px 24px 84px;position:relative;overflow:hidden}
+.kicker{font-family:var(--grot);font-size:12px;letter-spacing:.34em;color:var(--gold2);text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.kicker::before{content:"";width:34px;height:1px;background:var(--gold)}
+h1{font-family:var(--serif);font-weight:900;font-size:clamp(44px,7.2vw,84px);line-height:1.14;margin:22px 0 8px;letter-spacing:.01em}
+h1 .grad{background:linear-gradient(100deg,var(--gold2) 10%,#ffdf9e 45%,var(--gold) 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{color:var(--muted);font-size:clamp(15px,2vw,18px);line-height:1.85;max-width:620px;margin-top:14px}
+.cta{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap}
+.btn{font-family:var(--sans);font-weight:700;font-size:15px;border-radius:999px;padding:14px 30px;cursor:pointer;border:1px solid transparent;transition:transform .18s ease,box-shadow .18s ease,background .18s}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(120deg,var(--gold2),var(--gold));color:#221a05;box-shadow:0 10px 34px rgba(227,168,43,.28)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 42px rgba(227,168,43,.38)}
+.btn-ghost{background:transparent;color:var(--txt);border-color:var(--line)}
+.btn-ghost:hover{background:var(--panel2);transform:translateY(-2px)}
+.stats{display:flex;gap:clamp(22px,5vw,58px);margin-top:52px;flex-wrap:wrap}
+.stat .n{font-family:var(--grot);font-size:clamp(30px,4vw,44px);font-weight:700;color:var(--txt)}
+.stat .n em{font-style:normal;color:var(--gold)}
+.stat .t{color:var(--muted2);font-size:12.5px;letter-spacing:.18em;margin-top:4px}
+/* hero IDE */
+.ide{margin-top:58px;position:relative;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid var(--line);box-shadow:0 40px 90px rgba(0,0,0,.5);overflow:hidden}
+.ide-bar{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.25)}
+.dot{width:12px;height:12px;border-radius:50%}
+.ide-tab{margin-left:12px;font-family:var(--mono);font-size:12.5px;color:#cfd6dd;background:rgba(255,255,255,.06);padding:5px 14px;border-radius:8px 8px 0 0;border:1px solid var(--line);border-bottom:none}
+.ide-body{display:grid;grid-template-columns:1fr 300px;min-height:238px}
+.ide-code{padding:20px 22px;font-family:var(--mono);font-size:14.5px;line-height:1.85;white-space:pre-wrap;word-break:break-all}
+.ide-console{border-left:1px solid var(--line);background:rgba(0,0,0,.32);padding:18px;font-family:var(--mono);font-size:13px;line-height:1.9;color:#b9f0cf}
+.ide-console .hd{color:var(--muted2);font-size:11px;letter-spacing:.22em;margin-bottom:8px}
+.caret{display:inline-block;width:9px;height:18px;background:var(--gold2);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.tok-kw{color:#c792ea}.tok-str{color:#9ece6a}.tok-num{color:#ff9e64}.tok-fn{color:#7aa2f7}.tok-cm{color:#565f89}
+.chip{position:absolute;font-family:var(--mono);font-size:12px;padding:8px 14px;border-radius:999px;background:rgba(13,16,22,.85);border:1px solid var(--line);backdrop-filter:blur(6px);animation:floaty 7s ease-in-out infinite;z-index:2}
+.chip b{color:var(--gold2);font-weight:600}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
+/* ---------- route ---------- */
+.route{max-width:1120px;margin:0 auto;padding:30px 24px 40px}
+.route-head{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:8px}
+.route-head h2{font-family:var(--serif);font-weight:900;font-size:clamp(30px,4.4vw,46px)}
+.route-head p{color:var(--muted);width:100%;line-height:1.8}
+.search{margin:22px 0 6px;display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 18px;max-width:420px}
+.search input{background:none;border:none;outline:none;color:var(--txt);font-size:15px;width:100%;font-family:var(--sans)}
+.search input::placeholder{color:var(--muted2)}
+.stage{margin-top:52px;position:relative}
+.stage-head{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+.medal{width:52px;height:52px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--serif);font-weight:900;font-size:21px;color:#221a05;background:linear-gradient(140deg,var(--gold2),var(--gold));box-shadow:0 8px 26px rgba(227,168,43,.35);position:relative;z-index:2}
+.stage-head h3{font-family:var(--serif);font-size:24px;font-weight:900}
+.stage-head .ss{color:var(--muted);font-size:13.5px;margin-top:3px}
+.stage-bar{flex:1;max-width:300px;height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-left:auto}
+.stage-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.stage-pct{font-family:var(--grot);font-size:13px;color:var(--muted);min-width:44px;text-align:right}
+.lessons{position:relative;margin-left:25px;padding-left:52px}
+.lessons::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:2px;background:rgba(255,255,255,.1);border-radius:2px}
+.lessons .fill{position:absolute;left:0;top:6px;width:2px;background:linear-gradient(180deg,var(--gold2),var(--gold));border-radius:2px;transition:height 1s cubic-bezier(.22,1,.36,1);box-shadow:0 0 14px rgba(227,168,43,.55)}
+.lsn{position:relative;margin-bottom:16px}
+.node{position:absolute;left:-52px;top:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:#10141b;border:2px solid rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--grot);font-size:13.5px;font-weight:700;color:var(--muted);z-index:2;transition:all .3s}
+.lsn.done .node{background:linear-gradient(140deg,var(--gold2),var(--gold));border-color:transparent;color:#221a05;box-shadow:0 0 0 5px rgba(227,168,43,.14)}
+.lsn.current .node{border-color:var(--gold);color:var(--gold2);animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(227,168,43,.35)}50%{box-shadow:0 0 0 9px rgba(227,168,43,0)}}
+.card{position:relative;border-radius:16px;background:var(--panel);border:1px solid var(--line);padding:20px 22px;cursor:pointer;overflow:hidden;transition:transform .25s ease,border-color .25s,background .25s;will-change:transform}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%),rgba(245,198,92,.13),transparent 65%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover::before{opacity:1}
+.card:hover{border-color:rgba(245,198,92,.4);background:var(--panel2)}
+.card .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.card h4{font-size:17.5px;font-weight:700;line-height:1.45}
+.tag{font-size:11px;letter-spacing:.08em;padding:4px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.tag.done{color:#221a05;background:linear-gradient(120deg,var(--gold2),var(--gold));border-color:transparent;font-weight:700}
+.tag.cur{color:var(--gold2);border-color:rgba(227,168,43,.5)}
+.card .meta{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted2)}
+.card p{color:var(--muted);font-size:14px;line-height:1.75;margin-top:9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.flag{display:flex;align-items:center;gap:10px;color:var(--muted2);font-size:13px;margin:4px 0 10px 2px}
+.flag::before{content:"⚑";color:var(--gold);font-size:15px}
+.empty{display:none;color:var(--muted);padding:26px 4px}
+/* ---------- lesson overlay ---------- */
+.overlay{position:fixed;inset:0;z-index:80;background:rgba(4,5,8,.72);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.open{opacity:1;pointer-events:auto}
+.sheet{position:absolute;inset:0;width:100%;height:100dvh;max-height:none;overflow-y:auto;background:linear-gradient(180deg,#10131c,#0a0d13);border:0;border-radius:0;padding:30px max(22px,calc((100vw - 900px)/2)) 56px;transform:translateY(26px);transition:transform .38s cubic-bezier(.22,1,.36,1)}
+.overlay.open .sheet{transform:translateY(0)}
+.sheet::-webkit-scrollbar{width:8px}.sheet::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:8px}
+.sh-head{display:flex;align-items:flex-start;gap:14px}
+.sh-head .stg{font-family:var(--grot);font-size:11px;letter-spacing:.26em;color:var(--gold2)}
+.sh-head h3{font-family:var(--serif);font-weight:900;font-size:clamp(23px,3.6vw,32px);line-height:1.35;margin-top:6px}
+.x{margin-left:auto;flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--txt);font-size:17px;cursor:pointer}
+.x:hover{background:var(--panel2)}
+.sec-t{font-family:var(--grot);font-size:11.5px;letter-spacing:.28em;color:var(--muted);margin:30px 0 12px;display:flex;align-items:center;gap:10px}
+.pref-t{margin-left:auto;letter-spacing:.02em;font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;cursor:pointer;text-transform:none}
+.pref-t input{accent-color:var(--gold);width:15px;height:15px;cursor:pointer}
+.prebar{margin:0 0 12px;max-height:64px;overflow:hidden;transition:opacity .55s ease,max-height .55s ease,margin-bottom .55s ease}
+.prebar.done{opacity:0;max-height:0;margin-bottom:0}
+.oline{animation:lineIn .42s cubic-bezier(.22,1,.36,1) both}
+@keyframes lineIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.shbody-in{animation:shIn .34s cubic-bezier(.22,1,.36,1)}
+@keyframes shIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.major-switch{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:99px;padding:3px;font-family:var(--grot);font-size:12px}
+.major-switch span{color:var(--muted2);padding:0 6px 0 10px;letter-spacing:.14em}
+.major-switch .mj{border:0;background:transparent;color:var(--muted);padding:5px 13px;border-radius:99px;cursor:pointer;font:inherit;transition:all .25s}
+.major-switch .mj.on{background:var(--gold);color:#14100a;font-weight:600}
+.diff{display:inline-flex;gap:3px;vertical-align:middle;margin-left:6px}
+.diff i{display:block;width:14px;height:3px;background:rgba(236,231,220,.18)}
+.diff i.on{background:var(--gold)}
+.pre-row{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.04em}
+.pre-row b{font-family:var(--grot);font-weight:600;color:var(--gold2);font-size:12.5px}
+.pre-track{height:6px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.pre-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 14px rgba(227,168,43,.45);transition:width .55s ease}
+.sec-t::after{content:"";flex:1;height:1px;background:var(--line)}
+.intro{font-size:15.5px;line-height:1.95;color:#d8d5cc}
+.intro p{margin:0 0 12px}
+.intro p:last-child{margin-bottom:0}
+.intro code{font-family:var(--mono);font-size:13.5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:1px 6px}
+.tip{margin-top:14px;border-left:3px solid var(--gold);background:rgba(227,168,43,.08);padding:13px 18px;border-radius:0 12px 12px 0;font-size:14.5px;line-height:1.8;color:#efe3c2}
+.tip b{color:var(--gold2)}
+.codebox{border-radius:14px;background:#0a0d12;border:1px solid var(--line);overflow:hidden}
+.codebox .cb-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.03)}
+.codebox .fn{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px}
+.runbtn{margin-left:auto;font-family:var(--sans);font-weight:700;font-size:12.5px;background:linear-gradient(120deg,var(--gold2),var(--gold));color:#221a05;border:none;border-radius:99px;padding:7px 18px;cursor:pointer}
+.runbtn:disabled{opacity:.55;cursor:default}
+.codebox pre{padding:18px 20px;font-family:var(--mono);font-size:14px;line-height:1.85;overflow-x:auto;min-height:60px}
+.console{border-top:1px dashed var(--line);padding:0 20px;font-family:var(--mono);font-size:13.5px;line-height:1.9;color:#b9f0cf;opacity:0;max-height:0;overflow:hidden;transform:translateY(6px);transition:opacity .55s cubic-bezier(.22,1,.36,1),max-height .55s cubic-bezier(.22,1,.36,1),padding .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}
+.console.show{opacity:1;max-height:320px;padding:14px 20px;transform:none}
+.console .hd{color:var(--muted2);font-size:10.5px;letter-spacing:.24em;margin-bottom:4px}
+.qdots{display:flex;gap:8px;margin-bottom:16px}
+.qdots i{width:26px;height:5px;border-radius:99px;background:rgba(255,255,255,.13);transition:background .3s}
+.qdots i.ok{background:var(--green)}.qdots i.bad{background:var(--red)}.qdots i.now{background:var(--gold)}
+.quiz-q{font-size:16.5px;font-weight:700;line-height:1.7}
+.quiz-q code{font-family:var(--mono);background:rgba(255,255,255,.07);padding:1px 7px;border-radius:6px;font-size:14.5px}
+.opts{margin-top:16px;display:grid;gap:11px}
+.opt{text-align:left;font-family:var(--sans);font-size:15px;color:var(--txt);background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px 18px;cursor:pointer;transition:all .18s;line-height:1.6}
+.opt:hover{border-color:rgba(245,198,92,.45);background:var(--panel2)}
+.opt code{font-family:var(--mono);font-size:13.5px}
+.opt.right{border-color:var(--green);background:rgba(67,196,101,.13);animation:sweep .5s ease}
+.opt.wrong{border-color:var(--red);background:rgba(229,96,79,.12);animation:shake .4s ease}
+.opt:disabled{cursor:default;opacity:.85}
+@keyframes sweep{0%{box-shadow:inset 0 0 0 0 rgba(67,196,101,.35)}100%{box-shadow:inset 0 0 0 60px rgba(67,196,101,0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.why{display:none;margin-top:14px;font-size:14px;line-height:1.8;color:#cfd3c9;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.why.show{display:block}
+.quiz-foot{display:flex;gap:12px;margin-top:22px;align-items:center;flex-wrap:wrap}
+.score{font-family:var(--grot);color:var(--muted);font-size:14px}
+.sh-nav{display:flex;gap:12px;margin-top:34px;border-top:1px solid var(--line);padding-top:22px}
+.sh-nav .btn{padding:11px 24px;font-size:14px}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,1.08,.36,1)}
+.reveal.in{opacity:1;transform:none}
+footer{max-width:1120px;margin:0 auto;padding:60px 24px 70px;color:var(--muted2);font-size:13px;line-height:2;border-top:1px solid var(--line);margin-top:40px}
+footer b{color:var(--muted)}
+#confetti{position:fixed;inset:0;z-index:120;pointer-events:none}
+@media(max-width:760px){
+  .ide-body{grid-template-columns:1fr}
+  .ide-console{border-left:none;border-top:1px solid var(--line)}
+  .lessons{margin-left:8px;padding-left:40px}
+  .node{left:-40px;width:33px;height:33px;font-size:12px}
+  .chip{display:none}
+  .hero{padding-top:120px}
+}
+/* ---------- hands-on coding judge ---------- */
+.code-task{font-size:15px;line-height:1.85;color:#d8d5cc;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:13px;padding:15px 18px}
+.code-task b{color:var(--gold2)}
+.editor{margin-top:14px;border-radius:14px;background:#0a0d12;border:1px solid var(--line);overflow:hidden}
+.editor .cb-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.03)}
+.ed-wrap{display:flex;min-height:150px}
+.ed-gutter{padding:14px 0;width:44px;flex:none;text-align:right;font-family:var(--mono);font-size:13.5px;line-height:1.8;color:#454c58;border-right:1px solid var(--line);background:rgba(255,255,255,.02);overflow:hidden;user-select:none}
+.ed-gutter div{padding-right:12px}
+.ed-gutter .err-line{color:#ff8a7a;font-weight:700}
+#edCode{flex:1;background:transparent;border:none;outline:none;resize:vertical;min-height:150px;padding:14px 16px;font-family:var(--mono);font-size:13.5px;line-height:1.8;color:#e6e9ee;white-space:pre;overflow:auto;tab-size:2}
+.code-fb{display:none;margin-top:14px;border-radius:13px;padding:16px 18px;font-size:14.5px;line-height:1.85;border:1px solid var(--line)}
+.code-fb.show{display:block}
+.code-fb.pass{border-color:rgba(67,196,101,.55);background:rgba(67,196,101,.09)}
+.code-fb.fail{border-color:rgba(229,96,79,.5);background:rgba(229,96,79,.07)}
+.code-fb .fb-t{font-weight:700;font-size:15.5px}
+.code-fb table{width:100%;border-collapse:collapse;margin-top:10px;font-family:var(--mono);font-size:12.8px}
+.code-fb td,.code-fb th{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top;word-break:break-all}
+.code-fb th{color:var(--muted);font-weight:500;background:rgba(255,255,255,.03)}
+.code-fb tr.bad td{background:rgba(229,96,79,.13)}
+.code-fb tr.ok td{color:#a9c7ae}
+.code-fb .src-line{font-family:var(--mono);background:rgba(0,0,0,.35);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:13px;color:#ffb4a6;white-space:pre-wrap;word-break:break-all}
+/* ---------- hero globe ---------- */
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center;text-align:left}
+.hero-left .cta{justify-content:flex-start}
+.hero-left .stats{margin-top:40px}
+.globe-wrap{position:relative;width:100%;max-width:500px;margin:0 auto}
+@media(min-width:921px){.globe-wrap{margin-top:-52px}}
+#globeCv{width:100%;aspect-ratio:1;display:block;cursor:grab;touch-action:none}
+.globe-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;letter-spacing:.14em;pointer-events:none;animation:globePulse 1.6s ease-in-out infinite}
+.globe-loading.off{display:none}
+@keyframes globePulse{0%,100%{opacity:.45}50%{opacity:1}}
+#globeCv:active{cursor:grabbing}
+.globe-bar{display:flex;align-items:center;gap:14px;justify-content:center;margin-top:6px;flex-wrap:wrap}
+.globe-bar span{font-size:12.5px;color:var(--muted2)}
+#gestureCam{position:absolute;right:0;bottom:0;width:2px;height:2px;opacity:0;pointer-events:none;z-index:3}
+#gestureCam.on{display:block}
+@media(max-width:920px){.hero-grid{grid-template-columns:1fr;text-align:center}.hero-left .cta{justify-content:center}.hero h1{font-size:52px}}
+/* ---------- polish: scroll progress, hero glow, back-to-top ---------- */
+#scrollProg{position:fixed;top:0;left:0;height:2.5px;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));z-index:60;box-shadow:0 0 12px rgba(227,168,43,.7);transition:width .12s linear}
+.hero-glow{position:absolute;width:560px;height:560px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(245,198,92,.09),transparent 62%);left:0;top:0;z-index:-1;will-change:transform;transition:opacity .45s ease}
+/* ---------- liquid glass pass ---------- */
+nav{backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);background:linear-gradient(180deg,rgba(17,20,29,.72),rgba(9,11,17,.55));border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 14px 34px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)}
+.card{background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.014) 45%,rgba(255,255,255,.028));border-color:rgba(255,255,255,.09);backdrop-filter:blur(12px) saturate(1.35);-webkit-backdrop-filter:blur(12px) saturate(1.35);box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.07)}
+.chip{background:linear-gradient(160deg,rgba(26,30,42,.85),rgba(13,16,22,.8));backdrop-filter:blur(10px) saturate(1.4);-webkit-backdrop-filter:blur(10px) saturate(1.4);border-color:rgba(255,255,255,.11);box-shadow:0 12px 28px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.09)}
+.search{background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.02));backdrop-filter:blur(12px) saturate(1.35);-webkit-backdrop-filter:blur(12px) saturate(1.35);border-color:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 30px rgba(0,0,0,.28)}
+.btn-ghost{background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-color:rgba(255,255,255,.12)}
+.opt{background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.018));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.x{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.xp{font-family:var(--grot);font-weight:700;font-size:13px;color:var(--gold2);letter-spacing:.05em}
+.achv{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 2px}
+.bdg{font-size:12.5px;padding:7px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.09);color:var(--muted2);background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.01));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.bdg.on{color:#221a05;font-weight:700;background:linear-gradient(120deg,var(--gold2),var(--gold));border-color:transparent;box-shadow:0 8px 22px rgba(227,168,43,.35),inset 0 1px 0 rgba(255,255,255,.5)}
+#toTop{position:fixed;right:22px;bottom:22px;z-index:70;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(13,16,22,.88);color:var(--gold2);font-size:19px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;backdrop-filter:blur(6px)}
+#toTop.show{opacity:1;pointer-events:auto}
+#toTop:hover{transform:translateY(-3px)}
+.medal::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.5) 48%,transparent 62%);background-size:250% 100%;background-position:120% 0;transition:background-position .8s ease}
+.stage-head:hover .medal::after{background-position:-60% 0}
+/* ---------- community: notes & feedback ---------- */
+.navlink{font-size:13.5px;color:var(--muted);text-decoration:none;margin-right:4px}
+.navlink:hover{color:var(--gold2)}
+.comm-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:26px}
+.comm-card{border-radius:18px;background:var(--panel);border:1px solid var(--line);padding:26px 26px 28px}
+.comm-card h3{font-family:var(--serif);font-weight:900;font-size:21px}
+.comm-card .ss{color:var(--muted);font-size:13.5px;margin:6px 0 16px;line-height:1.7}
+.comm-card .ai-in{margin-bottom:12px}
+.comm-card textarea.ai-in{resize:vertical;line-height:1.75}
+.note-item{border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;background:rgba(255,255,255,.03);padding:13px 16px;margin-top:12px}
+.note-item .nh{display:flex;gap:10px;align-items:baseline;font-size:12.5px;color:var(--muted2)}
+.note-item .nh b{color:var(--gold2);font-size:13px}
+.note-item .nh button{margin-left:auto;background:none;border:none;color:var(--muted2);cursor:pointer;font-size:12px}
+.note-item .nh button:hover{color:var(--red)}
+.note-item .nt{font-size:14.5px;line-height:1.8;margin-top:5px;color:#ddd9cd;white-space:pre-wrap;word-break:break-word}
+.note-empty{color:var(--muted2);font-size:13.5px;margin-top:14px}
+@media(max-width:760px){.comm-grid{grid-template-columns:1fr}.navlink{display:none}}
+/* ---------- AI settings & tutor ---------- */
+.aimodal{position:fixed;inset:0;z-index:90;background:rgba(4,5,8,.72);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+.aimodal.open{opacity:1;pointer-events:auto}
+.aibox{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,94vw);max-height:90vh;overflow-y:auto;background:#0d1017;border:1px solid var(--line);border-radius:22px;padding:30px clamp(20px,4vw,36px) 34px;box-shadow:0 50px 120px rgba(0,0,0,.6)}
+.ai-note{color:var(--muted);font-size:13.5px;line-height:1.85;margin-top:14px}
+.ai-lab{display:block;font-size:12px;letter-spacing:.14em;color:var(--muted);margin:18px 0 7px}
+.ai-in{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:11px;color:var(--txt);font-size:14.5px;padding:12px 15px;outline:none;font-family:var(--sans)}
+.ai-in:focus{border-color:rgba(227,168,43,.55)}
+select.ai-in option{background:#12151d}
+.ai-qrow{display:flex;gap:10px;margin-top:4px}
+.ai-qrow input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:11px;color:var(--txt);font-size:14.5px;padding:12px 15px;outline:none;font-family:var(--sans)}
+.ai-qrow input:focus{border-color:rgba(227,168,43,.55)}
+.ai-reply{display:none;margin-top:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:0 12px 12px 0;padding:15px 18px;font-size:14.5px;line-height:1.9;color:#dfe4da;white-space:pre-wrap;word-break:break-word}
+.ai-thread{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:6px 2px}
+.ai-thread::-webkit-scrollbar{width:5px}
+.ai-thread::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:3px}
+.msg{max-width:88%;padding:11px 15px;border-radius:14px;font-size:14.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word}
+.msg.a{align-self:flex-start;background:rgba(255,255,255,.05);border:1px solid var(--line);border-bottom-left-radius:5px;color:#dfe4da}
+.msg.u{align-self:flex-end;background:rgba(227,168,43,.15);border:1px solid rgba(227,168,43,.38);border-bottom-right-radius:5px;color:#f3e5c3}
+.msg code{font-family:var(--mono);background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px;font-size:13px}
+.msg.err{color:#ffb4a6;border-color:rgba(229,96,79,.5)}
+.ai-reply.show{display:block}
+.ai-reply code{font-family:var(--mono);background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px;font-size:13px}
+/* ===== redesign 2026-11-19 · editorial print (大字 · 留白 · 细线 · 克制) ===== */
+:root{--bg:#08090b;--panel:#0d0f12;--panel2:#121419;--line:rgba(236,231,220,.14)}
+.aurora{display:none}
+.grain{opacity:.04}
+nav{background:rgba(8,9,11,.85);box-shadow:none}
+.hero{padding-top:124px}
+.masthead{display:flex;justify-content:space-between;align-items:baseline;gap:18px;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:46px;font-family:var(--grot);font-size:11.5px;letter-spacing:.22em;color:var(--muted);white-space:nowrap;overflow:hidden}
+h1{letter-spacing:-.01em}
+h1 .grad{background:none;color:var(--gold2);-webkit-text-fill-color:var(--gold2)}
+.hero .sub{font-size:16.5px;line-height:1.95;color:#cfc9bc;max-width:57ch}
+.stats{border-top:1px solid var(--line);padding-top:24px}
+.stat .n{font-family:var(--serif)}
+.ide{border-radius:12px;box-shadow:0 34px 70px rgba(0,0,0,.55)}
+.route-head h2{font-size:clamp(30px,4.2vw,44px);letter-spacing:-.01em}
+.search{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:12px 2px;max-width:460px}
+.medal{background:none;border:1px solid rgba(227,168,43,.55);color:var(--gold2);box-shadow:none}
+.medal::after{display:none}
+.card{background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:22px 8px 24px}
+.card:hover{background:rgba(255,255,255,.025)}
+.node{background:var(--bg);border:1px solid rgba(236,231,220,.3)}
+.lsn.done .node{background:var(--gold);border-color:transparent;color:#221a05;box-shadow:none}
+.comm-card{border-radius:12px;background:var(--panel);box-shadow:none}
+.bdg{border-radius:3px}
+.opt{border-radius:4px;background:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.sheet{background:#0a0b0d}
+.sh-head h3{font-size:clamp(26px,3.8vw,38px)}
+@media(max-width:640px){.masthead span:nth-child(2){display:none}.hero{padding-top:102px}}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div id="scrollProg"></div>
+<nav><div class="nav-in">
+  <div class="logo">HOBART <b>SZE</b> · PYTHON</div>
+  <div class="sp"></div>
+  <a class="navlink" href="#community">交流区</a>
+  <button class="btn btn-ghost" id="aiBtn" style="padding:8px 18px;font-size:13px">接入我的 AI</button>
+  <div class="major-switch" title="专业方向：会计版保留账本场景（默认），通用版把场景表述换成通用数据"><span>专业</span><button id="majorAcct" class="mj on">会计</button><button id="majorGen" class="mj">通用</button></div>
+  <div class="ringwrap">
+    <svg class="ring" width="34" height="34" viewBox="0 0 34 34"><circle class="bgc" cx="17" cy="17" r="14.5" fill="none" stroke-width="3.4"/><circle class="fgc" id="ringFg" cx="17" cy="17" r="14.5" fill="none" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="91.1" stroke-dashoffset="91.1"/></svg>
+    <span id="ringTxt">已完成 0 / 41 课</span>
+    <span class="xp" id="xpLab">0 XP</span>
+  </div>
+</div></nav>
+
+<header class="hero">
+  <div class="masthead"><span>HOBART SZE · PYTHON 自学教程</span><span>41 课 · 164 题 · 1120 分钟</span><span>广州 · 二〇二六</span></div>
+  <div class="hero-grid">
+    <div class="hero-left">
+      <h1>把 Python<br>一课一课<span class="grad">走完</span>。</h1>
+      <p class="sub">从第一行 print，到亲手做出一份账本报告——41 课、123 道选择题加 41 道动手编程题，每课都有会动的代码演示；你写的代码会被真的运行、逐行判定对错。进度保存在这台设备上，随时回来接着走。</p>
+      <div class="cta">
+        <button class="btn btn-gold" id="ctaStart">开始学习 →</button>
+        <button class="btn btn-ghost" id="ctaRoute">看学习路线</button>
+      </div>
+      <div class="stats reveal">
+        <div class="stat"><div class="n"><span data-count="41">0</span><em> 课</em></div><div class="t">LESSONS</div></div>
+        <div class="stat"><div class="n"><span data-count="164">0</span><em> 题</em></div><div class="t">选择题 + 动手编程题</div></div>
+        <div class="stat"><div class="n"><span data-count="1120">0</span><em> 分钟</em></div><div class="t">总时长</div></div>
+        <div class="stat"><div class="n"><span data-count="5">0</span><em> 阶段</em></div><div class="t">地基 · 工具 · 会计应用 · 进阶应用 · 网络与爬虫</div></div>
+      </div>
+    </div>
+    <div class="globe-wrap reveal">
+      <div class="globe-loading" id="globeLoading">地 球 加 载 中</div>
+      <canvas id="globeCv"></canvas>
+      <div class="globe-bar">
+        <button class="btn btn-ghost" id="gestureBtn" style="padding:9px 20px;font-size:13.5px">✋ 开启手势控制</button>
+        <span id="gestureState">拖动旋转 · 滚轮缩放 · 金点是广州</span>
+      </div>
+      <video id="gestureCam" playsinline muted></video>
+    </div>
+  </div>
+  <div class="ide reveal" id="heroIde">
+    <div class="ide-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="ide-tab" id="heroFile">hello.py</span></div>
+    <div class="ide-body">
+      <div class="ide-code" id="heroCode"></div>
+      <div class="ide-console"><div class="hd">运行结果 · CONSOLE</div><div id="heroOut"></div></div>
+    </div>
+  </div>
+</header>
+
+<main class="route" id="route">
+  <div class="route-head reveal">
+    <h2>学习路线</h2>
+    <p>一条线走到底：学完一课，金线就向前走一格。点任意一课开始——讲解、代码演示、练习，都在里面。</p>
+  </div>
+  <div class="search reveal"><span style="color:var(--muted2)">⌕</span><input id="searchBox" type="text" placeholder="搜索课程，例如：循环、字典、pandas…"></div>
+  <div class="achv reveal" id="achvRow"></div>
+  <div id="stages"></div>
+  <div class="empty" id="emptyMsg">没有找到匹配的课程，换个关键词试试。</div>
+</main>
+
+<section class="route" id="community" style="padding-top:6px">
+  <div class="route-head reveal">
+    <h2>交流与反馈</h2>
+    <p>写下你的学习心得，或者告诉我们哪里可以做得更好。心得会保存在你这台设备上随时回看；想让大家都看到、一起讨论，就发到本站的 GitHub 交流区——所有人可见、可以回复。</p>
+  </div>
+  <div class="comm-grid">
+    <div class="comm-card reveal">
+      <h3>✎ 学习心得</h3>
+      <div class="ss">有新的心得？来和大家交流吧</div>
+      <input id="noteName" class="ai-in" type="text" placeholder="署名（可不填）" autocomplete="off">
+      <textarea id="noteText" class="ai-in" rows="4" placeholder="例如：第 12 课终于搞懂 range 为什么不包含结尾…"></textarea>
+      <div class="quiz-foot" style="margin-top:14px">
+        <button class="btn btn-gold" id="noteAdd" style="padding:11px 24px;font-size:14px">记下来</button>
+        <a class="btn btn-ghost" style="padding:11px 22px;font-size:14px;text-decoration:none" href="https://github.com/HobartSZE/HobartSZE.github.io/discussions" target="_blank" rel="noopener">发到 GitHub 交流区 →</a>
+      </div>
+      <div id="noteList"></div>
+    </div>
+    <div class="comm-card reveal">
+      <h3>⚑ 意见反馈</h3>
+      <div class="ss">有bug或意见？没问题，交给我</div>
+      <label class="ai-lab" style="margin-top:4px">反馈类型</label>
+      <select id="fbType" class="ai-in">
+        <option>内容纠错</option><option>难度建议</option><option>讲解改进</option><option>功能建议</option><option>其他</option>
+      </select>
+      <label class="ai-lab">具体内容</label>
+      <textarea id="fbText" class="ai-in" rows="4" placeholder="例如：第 8 课第二题的选项有点绕，建议…"></textarea>
+      <div class="quiz-foot" style="margin-top:14px">
+        <button class="btn btn-gold" id="fbGo" style="padding:11px 24px;font-size:14px">去 GitHub 提交反馈</button>
+        <a class="btn btn-ghost" style="padding:11px 22px;font-size:14px;text-decoration:none" href="https://github.com/HobartSZE/HobartSZE.github.io/issues" target="_blank" rel="noopener">看已有反馈</a>
+      </div>
+      <p class="ai-note">提交会跳转到 GitHub Issues（需要 GitHub 账号），站长能收到、逐条回复和改进；提交内容对所有人可见。</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>Hobart SZE</b> · Python 自学之旅 —— 与「Python 自学空间」同一套课程的网页版。<br>
+  本站由 GitHub Pages 托管，学习进度只保存在你这台设备的浏览器里，不上传任何数据。
+</footer>
+
+<div class="aimodal" id="aiModal"><div class="aibox">
+  <div class="sh-head"><div><div class="stg">BRING YOUR OWN AI</div><h3 style="font-family:var(--serif);font-weight:900;font-size:24px;margin-top:6px">接入你自己的 AI</h3></div><button class="x" id="aiClose" aria-label="关闭">✕</button></div>
+  <p class="ai-note">填入你自己的 AI 接口和 API Key，就能在每一课里向 AI 提问、要讲解。Key 只保存在你这台设备的浏览器里，本站没有任何服务器，拿不到你的 Key；调用产生的费用算在你自己的账号上。</p>
+  <label class="ai-lab">接口预设</label>
+  <select id="aiPreset" class="ai-in"></select>
+  <label class="ai-lab">接口地址（Base URL）</label>
+  <input id="aiBase" class="ai-in" type="text" placeholder="https://api.openai.com/v1" autocomplete="off">
+  <label class="ai-lab">API Key</label>
+  <input id="aiKey" class="ai-in" type="password" placeholder="sk-…" autocomplete="off">
+  <label class="ai-lab">模型</label>
+  <input id="aiModel" class="ai-in" type="text" placeholder="例如 gpt-4o-mini 或 deepseek-chat" autocomplete="off">
+  <div class="quiz-foot" style="margin-top:20px">
+    <button class="btn btn-gold" id="aiSave" style="padding:11px 26px;font-size:14px">保存</button>
+    <button class="btn btn-ghost" id="aiClear" style="padding:11px 22px;font-size:14px">清除 Key</button>
+    <span class="score" id="aiState"></span>
+  </div>
+</div></div>
+<div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
+<button id="toTop" aria-label="回到顶部">↑</button>
+<canvas id="confetti"></canvas>
+<script>
+const STAGES = [{"name": "地基", "sub": "先把最核心的语法打牢", "medal": "一"}, {"name": "工具", "sub": "让程序能存数据、读文件、处理真实文本", "medal": "二"}, {"name": "会计应用", "sub": "用 pandas 把账本数据玩起来", "medal": "三"}, {"name": "进阶应用", "sub": "文件、Excel、数据清洗与报告，一次练成手艺", "medal": "四"}, {"name": "网络与爬虫", "sub": "把网上的数据礼貌地拿回来", "medal": "五"}];
+const LESSONS = [{"stage": 0, "title": "你好，Python：print 与第一行代码", "mins": 15, "intro": "print() 是你和程序对话的第一个窗口：括号里写什么，屏幕就显示什么；写算式的话，会先算出结果再显示。", "code": "print(\"你好，Python\")\nprint(19.82 + 14.24)", "out": ["你好，Python", "34.06"], "tip": "print 里写算式，会先算出结果再显示。", "quiz": [{"q": "上面代码第二行会显示什么？", "opts": ["19.82 + 14.24", "34.06", "34.06000000000001"], "ans": 1, "why": "print 里是算式时，先计算 19.82 + 14.24 = 34.06 再显示。"}, {"q": "想显示文字「午餐」原样，应该怎么写？", "opts": ["print(午餐)", "print(\"午餐\")", "print[午餐]"], "ans": 1, "why": "文字要放在引号里，变成字符串；不加引号会被当成变量名。"}, {"q": "print(3 + 4) 显示的是？", "opts": ["3 + 4", "7", "「3 + 4」"], "ans": 1, "why": "没有引号就是算式，先算再显示，结果是 7。"}], "gi": 0, "diff": 1, "explain": "<p><b>是什么：</b><code>print()</code> 是你和程序对话的第一个窗口：括号里写什么，屏幕就显示什么。它是学 Python 的第一步，也是以后检查程序有没有跑对的最常用工具。</p><p><b>代码怎么读：</b>第一行 <code>print(\"你好，Python\")</code> 里，引号括住的是文字，照原样显示。第二行 <code>print(19.82 + 14.24)</code> 没有引号，里面是个算式，程序会先算出结果 34.06，再把结果显示出来——所以同一条 <code>print</code>，放文字和放算式的行为是不一样的。</p><p><b>容易错：</b>想显示文字却忘了写引号，程序会把文字当成变量名，报 <code>NameError</code>；引号、括号也要用英文半角的，中文全角符号会直接报错。记住一句话：<b>有引号是原样显示，没引号是先算再显示</b>。</p>", "coding": {"task": "用两行 print：一行显示文字「开始学习」，一行显示 21.02 + 9.9 的结果。", "starter": "# 第一行显示文字，第二行显示算式结果\n", "expected": ["开始学习", "30.92"]}}, {"stage": 0, "title": "变量：给数据起个名字", "mins": 20, "intro": "变量就是给数据贴个标签：lunch = 19.82 之后，lunch 就代表这个数。赋值时先算右边，再把结果存进左边的名字。", "code": "lunch = 19.82\ndinner = 14.24\ntotal = lunch + dinner\nprint(total)", "out": ["34.06"], "tip": "先算右边 lunch + dinner，再把结果存进 total。", "quiz": [{"q": "运行后 total 的值是？", "opts": ["lunch + dinner", "34.06", "19.82"], "ans": 1, "why": "先算右边 19.82 + 14.24 = 34.06，再存进 total。"}, {"q": "x = 5 之后，再写 x = 8，x 最后是？", "opts": ["5", "13", "8"], "ans": 2, "why": "后一次赋值会覆盖前一次，x 变成 8。"}, {"q": "哪个变量名不合法？", "opts": ["meal_price", "price2", "2price"], "ans": 2, "why": "变量名不能以数字开头。"}], "gi": 1, "diff": 1, "explain": "<p><b>是什么：</b>变量就是给数据贴个名字、找个地方存起来。<code>lunch = 19.82</code> 的意思，是把 19.82 这个数存进名叫 <code>lunch</code> 的盒子里，以后写 <code>lunch</code> 就代表这个数，不用每次都把数字重打一遍。</p><p><b>代码怎么读：</b>赋值时永远是<b>先算右边，再存进左边</b>：<code>total = lunch + dinner</code> 先算出 19.82 + 14.24 = 34.06，再把 34.06 存进 <code>total</code>，最后 <code>print(total)</code> 显示 34.06。变量名要见名知意，比如 <code>lunch</code> 一看就知道是午餐的钱。</p><p><b>容易错：</b>同一个名字重新赋值，旧值会被覆盖——<code>x = 5</code> 再写 <code>x = 8</code>，<code>x</code> 最后是 8；变量名不能以数字开头，<code>2price</code> 是非法的；等号在这里是「存进去」，不是数学里的「等于」。</p>", "coding": {"task": "补上 dinner = 14.24，再算出 total 并打印。", "starter": "lunch = 19.82\n# 在下面补上 dinner、total，并打印 total\n", "expected": ["34.06"]}}, {"stage": 0, "title": "运算符：加减乘除与整除余数", "mins": 25, "intro": "除了 + - * /，Python 还有三个常用的：// 整除只取商，% 取余数，** 是乘方。分账、凑整、算周期全靠它们。", "code": "a = 10\nb = 3\nprint(a // b)\nprint(a % b)\nprint(a ** b)", "out": ["3", "1", "1000"], "tip": "// 是整除只取商，% 取余数，别和 / 混淆。", "quiz": [{"q": "10 // 3 和 10 % 3 分别是？", "opts": ["3 和 1", "3.33 和 1", "1 和 3"], "ans": 0, "why": "10 ÷ 3 商 3 余 1：// 取商 3，% 取余 1。"}, {"q": "2 ** 4 等于？", "opts": ["8", "16", "6"], "ans": 1, "why": "** 是乘方，2 的 4 次方 = 16。"}, {"q": "10 / 3 的结果类型是？", "opts": ["整数 3", "小数 3.333…", "字符串"], "ans": 1, "why": "/ 是普通除法，结果永远是小数（float）。"}], "gi": 2, "diff": 1, "explain": "<p><b>是什么：</b>除了加减乘除，Python 还有三个很常用的运算符：<code>//</code> 整除只取商，<code>%</code> 取余数，<code>**</code> 是乘方。分账、凑整、算周期、判断奇偶，全靠它们。</p><p><b>代码怎么读：</b><code>10 // 3</code> 是 10 除以 3 的商 3；<code>10 % 3</code> 是余数 1；<code>10 ** 3</code> 是 10 的 3 次方 1000。注意 <code>/</code> 是普通除法，结果永远是小数，<code>10 / 3</code> 得到 3.333…，和 <code>//</code> 的 3 不是一回事。</p><p><b>容易错：</b><code>//</code> 和 <code>/</code>、<code>%</code> 和 <code>/</code> 最容易混淆，写之前先问自己要的是商、余数还是精确结果；运算顺序是先乘方，再乘除、整除、取余，最后加减，不确定就加括号，括号永远最先算。</p>", "coding": {"task": "打印 a % b 的余数，再打印 a ** b 的结果。", "starter": "a = 10\nb = 3\n# 打印余数和乘方\n", "expected": ["1", "1000"]}}, {"stage": 0, "title": "字符串入门：文字也是数据", "mins": 20, "intro": "引号括起来的就是字符串。字符串之间用 + 是首尾拼接，不是数学加法；顺序不同，结果就不同。", "code": "name = \"牛肉饭\"\ntext = \"今天吃\" + name\nprint(text)", "out": ["今天吃牛肉饭"], "tip": "字符串用 + 是首尾拼接，不是数学加法。", "quiz": [{"q": "\"ab\" + \"cd\" 的结果是？", "opts": ["abcd", "ab cd", "报错"], "ans": 0, "why": "字符串 + 是直接首尾相接，不加空格。"}, {"q": "\"5\" + \"3\" 的结果是？", "opts": ["8", "\"53\"", "53.0"], "ans": 1, "why": "两个都是字符串，拼接得到 \"53\"，不是加法 8。"}, {"q": "字符串 \"饭\" * 3 会得到？", "opts": ["报错", "饭饭饭", "饭 3"], "ans": 1, "why": "字符串乘整数是重复拼接。"}], "gi": 3, "diff": 1, "explain": "<p><b>是什么：</b>引号括起来的就是字符串，文字也是一种数据。字符串之间用 <code>+</code> 连接，是把两段文字首尾拼起来，不是数学加法，所以顺序不同，结果就不同。</p><p><b>代码怎么读：</b><code>name = \"牛肉饭\"</code> 把文字存进变量；<code>\"今天吃\" + name</code> 把「今天吃」和「牛肉饭」拼成「今天吃牛肉饭」。字符串还可以乘整数来重复，<code>\"饭\" * 3</code> 得到「饭饭饭」。</p><p><b>容易错：</b><code>\"5\" + \"3\"</code> 得到的是 <code>\"53\"</code>，不是 8——带引号的 5 和 3 是文字，不是数字；想做加法，要先把文字转成数字（下一课的类型转换就是干这个的）。</p>", "coding": {"task": "用字符串拼接，把「晚餐吃」和 name 拼起来打印。", "starter": "name = \"牛肉饭\"\n# 拼出「晚餐吃牛肉饭」并打印\n", "expected": ["晚餐吃牛肉饭"]}}, {"stage": 0, "title": "f-string：把变量塞进句子里", "mins": 20, "intro": "在字符串前加 f，花括号 {} 里的变量会被自动换成它的值，拼句子、做报表标题特别顺手。", "code": "item = \"牛肉饭\"\nprice = 21.02\nprint(f\"{item}：{price} 元\")", "out": ["牛肉饭：21.02 元"], "tip": "f-string 里的 {} 会被换成变量的值。", "quiz": [{"q": "x = 7，f\"共 {x} 笔\" 显示？", "opts": ["共 {x} 笔", "共 7 笔", "共 x 笔"], "ans": 1, "why": "{} 里的变量会被替换成它的值 7。"}, {"q": "f-string 最容易漏写的是？", "opts": ["引号", "开头的 f", "花括号"], "ans": 1, "why": "忘了开头的 f，{} 就只是普通文字，不会替换。"}, {"q": "f\"{2 + 3}\" 显示？", "opts": ["{2 + 3}", "5", "2 + 3"], "ans": 1, "why": "{} 里可以放算式，会先算出 5 再显示。"}], "gi": 4, "diff": 2, "explain": "<p><b>是什么：</b>f-string 是拼句子的顺手写法：在字符串前面加一个字母 <code>f</code>，花括号 <code>{}</code> 里的变量就会被自动换成它的值。做报表标题、打印一句话汇总时特别常用。</p><p><b>代码怎么读：</b><code>f\"{item}：{price} 元\"</code> 里，<code>{item}</code> 换成「牛肉饭」，<code>{price}</code> 换成 21.02，拼出来就是「牛肉饭：21.02 元」。花括号里不只能放变量，放算式也可以，<code>f\"{2 + 3}\"</code> 会先算出 5 再显示。</p><p><b>容易错：</b>最容易漏写开头的 <code>f</code>——没了它，花括号就只是普通文字，不会被替换，原样显示出来。写完 f-string，先检查 <code>f</code> 在不在引号前面。</p>", "coding": {"task": "用 f-string 打印一句话：牛肉饭 21.02 元（要用上 item 和 price 两个变量）。", "starter": "item = \"牛肉饭\"\nprice = 21.02\n# 用 f-string 打印\n", "expected": ["牛肉饭 21.02 元"]}}, {"stage": 0, "title": "类型转换：文字数字互转", "mins": 25, "intro": "从键盘、文件读来的数字都是字符串，要计算先用 float() 或 int() 转换；type() 可以查看一个值是什么类型。", "code": "text = \"20.5\"\nprice = float(text)\nprint(price + 10)\nprint(type(price))", "out": ["30.5", "<class 'float'>"], "tip": "字符串要先用 float() 转换，才能做加法。", "quiz": [{"q": "\"20.5\" 为什么要 float() 而不是 int()？", "opts": ["int 不能转文字", "它带小数点，int 会失败", "float 更快"], "ans": 1, "why": "\"20.5\" 有小数点，只能转成 float。"}, {"q": "int(9.9) 的结果是？", "opts": ["10", "9", "9.9"], "ans": 1, "why": "int() 直接砍掉小数部分，不四舍五入。"}, {"q": "\"abc\" 被 float() 转换会怎样？", "opts": ["得到 0", "得到 abc", "报错 ValueError"], "ans": 2, "why": "不是数字样子的字符串转换会报错。"}], "gi": 5, "diff": 2, "explain": "<p><b>是什么：</b>从键盘、文件读来的数字，一开始都是字符串，不能直接拿来计算。类型转换就是把数据从一种类型换成另一种：<code>float()</code> 转成小数，<code>int()</code> 转成整数，<code>str()</code> 转成文字；<code>type()</code> 可以查看一个值现在是什么类型。</p><p><b>代码怎么读：</b><code>text = \"20.5\"</code> 是字符串；<code>float(text)</code> 把它转成小数 20.5，存进 <code>price</code>；<code>price + 10</code> 得到 30.5；<code>type(price)</code> 显示 <code>&lt;class 'float'&gt;</code>，说明它现在是小数类型。</p><p><b>容易错：</b><code>\"20.5\"</code> 带小数点，只能用 <code>float()</code> 转，用 <code>int()</code> 会失败；<code>int(9.9)</code> 是直接砍掉小数部分得 9，不会四舍五入；<code>float(\"abc\")</code> 不是数字的样子，转换会报 <code>ValueError</code>。</p>", "coding": {"task": "把 text 转成小数，再加上 9.5，打印结果。", "starter": "text = \"20.5\"\n# 先转换，再计算并打印\n", "expected": ["30.0"]}}, {"stage": 0, "title": "input：让程序问你问题", "mins": 20, "intro": "input() 会暂停程序、等你输入。注意：它拿到的永远是字符串，要拿来算数，必须先转换类型。", "code": "name = input(\"你叫什么名字？\")\nprint(\"你好，\" + name)", "out": ["你叫什么名字？Hobart", "你好，Hobart"], "tip": "input 拿到的永远是字符串，要算数先转换。", "quiz": [{"q": "在 input 里输入 25，得到的值是？", "opts": ["数字 25", "字符串 \"25\"", "True"], "ans": 1, "why": "input 的返回值永远是字符串。"}, {"q": "想把输入当金额计算，正确写法是？", "opts": ["float(input(\"金额：\"))", "input(float(\"金额：\"))", "input + float"], "ans": 0, "why": "先 input 拿到字符串，再用 float() 包住转换。"}, {"q": "input() 执行时程序会？", "opts": ["直接跳过", "暂停等待用户输入", "自动填 0"], "ans": 1, "why": "input 会让程序停下来等输入。"}], "gi": 6, "diff": 2, "explain": "<p><b>是什么：</b><code>input()</code> 会让程序停下来，显示一句提示，等你从键盘输入点什么。它是程序第一次「问你问题」——但要记住，它拿到的东西永远是字符串。</p><p><b>代码怎么读：</b><code>input(\"你叫什么名字？\")</code> 先显示提示，等输入；输入的名字被存进 <code>name</code>，再用 <code>\"你好，\" + name</code> 拼出一句打招呼。课堂演示里输入 Hobart，输出就是「你好，Hobart」。</p><p><b>容易错：</b>在里面输入 25，得到的是字符串 <code>\"25\"</code>，不是数字 25，直接拿去加法会报错；想当金额计算，要写成 <code>float(input(\"金额：\"))</code>——先拿到字符串，再马上转换。</p>", "coding": {"task": "真实场景这里会用 input 问名字；练习里 name 已经给你。打印打招呼：你好，Hobart。", "starter": "name = \"Hobart\"  # 真实场景这一行是 input(\"你叫什么名字？\")\n# 打印：你好，Hobart\n", "expected": ["你好，Hobart"]}}, {"stage": 0, "title": "比较运算：True 与 False", "mins": 20, "intro": ">、<、==、!= 这些比较的结果只有两种：True 或 False。它们是后面 if 判断的原料。", "code": "price = 21.02\nprint(price > 20)\nprint(price == 21.02)", "out": ["True", "True"], "tip": "比较的结果只有 True 和 False 两种。", "quiz": [{"q": "3 == \"3\" 的结果是？", "opts": ["True", "False", "报错"], "ans": 1, "why": "数字和字符串类型不同，比较结果为 False。"}, {"q": "判断「不等于」用哪个符号？", "opts": ["<>", "!=", "=/="], "ans": 1, "why": "Python 里不等于写作 !=。"}, {"q": "5 >= 5 的结果是？", "opts": ["True", "False", "5"], "ans": 0, "why": ">= 包含等于，5 >= 5 成立。"}], "gi": 7, "diff": 1, "explain": "<p><b>是什么：</b>比较运算就是问程序一个「是不是」的问题，答案只有两种：<code>True</code>（对）或 <code>False</code>（错）。它们是后面 <code>if</code> 判断的原料，没有比较，就没法让程序做选择。</p><p><b>代码怎么读：</b><code>price &gt; 20</code> 问 21.02 是不是大于 20，是，所以是 <code>True</code>；<code>price == 21.02</code> 问是不是等于 21.02，也是 <code>True</code>。常用的符号有 <code>&gt;</code>、<code>&lt;</code>、<code>&gt;=</code>、<code>&lt;=</code>、<code>==</code>、<code>!=</code>（不等于）。</p><p><b>容易错：</b><code>==</code> 是判断相等，<code>=</code> 是赋值，两个长得很像但意思完全不同，写判断时少一个等号就全变了；数字和字符串类型不同，<code>3 == \"3\"</code> 的结果是 <code>False</code>。</p>", "coding": {"task": "打印两个比较结果：price >= 20，以及 price == 19.82。", "starter": "price = 21.02\n# 打印两个比较结果\n", "expected": ["True", "False"]}}, {"stage": 0, "title": "逻辑运算：and、or、not", "mins": 25, "intro": "and 要两边都成立才是 True；or 只要一边成立；not 把结果反过来。组合条件时先想清楚要哪种。", "code": "age = 19\nprint(age >= 18 and age < 60)", "out": ["True"], "tip": "and 要两边都成立，结果才是 True。", "quiz": [{"q": "True or False 的结果是？", "opts": ["True", "False", "报错"], "ans": 0, "why": "or 只要有一边 True 就是 True。"}, {"q": "not True 的结果是？", "opts": ["True", "False", "None"], "ans": 1, "why": "not 把布尔值反转。"}, {"q": "x = 5，x > 3 and x < 4 是？", "opts": ["True", "False", "5"], "ans": 1, "why": "x < 4 不成立，and 要求两边都成立，所以是 False。"}], "gi": 8, "diff": 2, "explain": "<p><b>是什么：</b>一个条件不够用时，就用逻辑运算把几个条件拼起来：<code>and</code> 要求两边都成立才是 <code>True</code>，<code>or</code> 只要一边成立就是 <code>True</code>，<code>not</code> 把结果反过来。</p><p><b>代码怎么读：</b><code>age &gt;= 18 and age &lt; 60</code> 是两个条件拼在一起：19 大于等于 18 是真的，19 小于 60 也是真的，两边都真，<code>and</code> 的结果就是 <code>True</code>。如果改成 <code>x &gt; 3 and x &lt; 4</code>，<code>x = 5</code> 时后一半不成立，整体就是 <code>False</code>。</p><p><b>容易错：</b>拼条件之前先用大白话说清楚自己要的是「同时满足」还是「满足一个就行」——前者用 <code>and</code>，后者用 <code>or</code>，选错了，程序的判断就和你的意思完全相反。</p>", "coding": {"task": "用 and 判断：年龄达标而且有证件时才为 True。把判断结果打印出来。", "starter": "age = 19\nhas_id = True\n# 用 and 组合两个条件并打印\n", "expected": ["True"]}}, {"stage": 0, "title": "if/else：让程序做选择", "mins": 20, "intro": "if 后面的条件成立，就执行缩进的那段代码；不成立就走 else。缩进不是装饰，是语法的一部分。", "code": "score = 82\nif score >= 60:\n    print(\"及格\")\nelse:\n    print(\"不及格\")", "out": ["及格"], "tip": "条件成立（82 ≥ 60）才执行下面缩进的代码。", "quiz": [{"q": "score 改成 45，会显示？", "opts": ["及格", "不及格", "两个都显示"], "ans": 1, "why": "条件不成立，走 else 分支。"}, {"q": "if 下面要执行的代码靠什么区分？", "opts": ["分号", "缩进", "括号"], "ans": 1, "why": "Python 用缩进划分代码块。"}, {"q": "if score >= 60: 这一行末尾不能少的是？", "opts": ["句号", "冒号 :", "逗号"], "ans": 1, "why": "条件行以冒号结尾，下一行缩进写要做的事。"}], "gi": 9, "diff": 2, "explain": "<p><b>是什么：</b><code>if / else</code> 让程序会做选择：条件成立，就执行缩进的那段代码；不成立，就走 <code>else</code> 那段。没有它，程序只能从上往下一条路走到黑。</p><p><b>代码怎么读：</b><code>score = 82</code>，<code>if score &gt;= 60:</code> 成立，就执行它下面缩进的 <code>print(\"及格\")</code>；<code>else</code> 那行不会执行。如果把分数改成 45，条件不成立，就会跳去 <code>else</code>，显示「不及格」。</p><p><b>容易错：</b><code>if</code> 那行末尾的冒号 <code>:</code> 不能少；条件下面要执行的代码必须缩进，通常是 4 个空格——缩进不是为了好看，它是语法的一部分，缩进不对程序就读不懂哪几行属于这个分支。</p>", "coding": {"task": "写 if / else：score 大于等于 60 打印「及格」，否则打印「不及格」。", "starter": "score = 57\n# 写出 if / else\n", "expected": ["不及格"]}}, {"stage": 0, "title": "elif：多分支判断", "mins": 20, "intro": "多个档位用 if / elif / else：从上往下逐个判断，命中一个分支就不再往下走，所以档位的顺序很重要。", "code": "score = 75\nif score >= 90:\n    print(\"优秀\")\nelif score >= 60:\n    print(\"及格\")\nelse:\n    print(\"不及格\")", "out": ["及格"], "tip": "从上往下判断，命中一个分支就不再往下走。", "quiz": [{"q": "score = 95 时显示？", "opts": ["优秀", "及格", "优秀和及格都显示"], "ans": 0, "why": "第一个条件就命中，执行完直接结束判断。"}, {"q": "elif 可以有几个？", "opts": ["只能 1 个", "最多 2 个", "任意多个"], "ans": 2, "why": "elif 数量不限，按需要加档位。"}, {"q": "所有条件都不成立时执行哪部分？", "opts": ["第一个 if", "else", "什么都不执行"], "ans": 1, "why": "else 是兜底分支。"}], "gi": 10, "diff": 2, "explain": "<p><b>是什么：</b>两档不够分，就用 <code>elif</code> 加分支：<code>if</code>、<code>elif</code>、<code>else</code> 连起来，可以把分数分成优秀、及格、不及格三档，甚至更多档。</p><p><b>代码怎么读：</b>程序从上往下逐个判断：75 不满足 <code>&gt;= 90</code>，继续往下；满足 <code>&gt;= 60</code>，显示「及格」，然后<b>立刻停下</b>，不再往下看。命中一个分支就不再往下走，这是 <code>elif</code> 最关键的规矩。</p><p><b>容易错：</b>分支的顺序很重要：一定要先写 <code>&gt;= 90</code> 再写 <code>&gt;= 60</code>，反过来写，95 分会先撞上「及格」就停住，永远拿不到「优秀」；<code>elif</code> 可以有任意多个，<code>else</code> 是兜底的「其余所有情况」。</p>", "coding": {"task": "用 if / elif / else 分三档：90 以上「优秀」、60 以上「及格」、以下「不及格」，打印 score = 92 的档位。", "starter": "score = 92\n# 写出三档判断\n", "expected": ["优秀"]}}, {"stage": 0, "title": "for 循环：重复做 N 次", "mins": 30, "intro": "for 循环让一段代码重复执行。range(1, 6) 会依次给出 1、2、3、4、5——包含开头，不包含结尾。", "code": "total = 0\nfor i in range(1, 6):\n    total = total + i\nprint(total)", "out": ["15"], "tip": "range(1, 6) 取 1、2、3、4、5，不包括 6。", "quiz": [{"q": "range(1, 6) 一共循环几次？", "opts": ["6 次", "5 次", "4 次"], "ans": 1, "why": "取 1 到 5，共 5 个数。"}, {"q": "循环结束后 total 是？", "opts": ["5", "15", "21"], "ans": 1, "why": "1+2+3+4+5 = 15，逐次累加进 total。"}, {"q": "range(3) 给出的数是？", "opts": ["1、2、3", "0、1、2", "3"], "ans": 1, "why": "只写一个数时从 0 开始，到该数减 1。"}], "gi": 11, "diff": 3, "explain": "<p><b>是什么：</b><code>for</code> 循环是「重复做 N 次」的写法：<code>range(1, 6)</code> 会依次给出 1、2、3、4、5，循环变量 <code>i</code> 每轮换一个值，循环体就跟着执行一次。累加、逐笔算账、批量处理，靠的都是它。</p><p><b>代码怎么读：</b>先把累加器 <code>total</code> 置 0；<code>i</code> 取 1 时，<code>total</code> 变 1；取 2 变 3；取 3 变 6；取 4 变 10；取 5 变 15；循环结束，<code>print(total)</code> 显示 15。注意 <code>range(1, 6)</code> 是左闭右开——包括 1，不包括 6，所以一共循环 5 次。</p><p><b>容易错：</b>累加器忘记先置 0，第一次加法就没地方放；<code>range(3)</code> 给出的是 0、1、2，不是 1、2、3；循环体也要缩进，忘记缩进的那行不会被重复执行。</p>", "coding": {"task": "用 for 循环和 range，把 1 到 10 加起来，打印总和。", "starter": "total = 0\n# 用 for + range(1, 11) 累加\nprint(total)", "expected": ["55"]}}, {"stage": 0, "title": "while 循环：条件成立就继续", "mins": 30, "intro": "while 在条件成立时反复执行。循环里必须让条件有机会变假——比如每次把 count 减 1，否则就是死循环。", "code": "count = 3\nwhile count > 0:\n    print(count)\n    count = count - 1\nprint(\"开始\")", "out": ["3", "2", "1", "开始"], "tip": "循环里必须更新 count，不然条件永远成立、死循环。", "quiz": [{"q": "如果删掉 count = count - 1 会怎样？", "opts": ["只循环一次", "死循环停不下来", "报错退出"], "ans": 1, "why": "count 一直是 3，条件永远成立。"}, {"q": "while 循环最少执行几次？", "opts": ["1 次", "0 次", "2 次"], "ans": 1, "why": "先判断条件，不成立就一次都不执行。"}, {"q": "上面代码一共 print 了几次？", "opts": ["3 次", "4 次", "5 次"], "ans": 1, "why": "循环里 3 次，加上最后的「开始」共 4 次。"}], "gi": 12, "diff": 3, "explain": "<p><b>是什么：</b><code>while</code> 循环是「条件成立就继续」的写法：先判断条件，成立就执行一轮，执行完再判断，直到条件不成立才停下来。它适合不知道要重复多少次、只知道「什么时候停」的情况。</p><p><b>代码怎么读：</b><code>count</code> 从 3 开始：3 &gt; 0 成立，打印 3，<code>count</code> 减 1 变 2；2 &gt; 0 成立，打印 2，变 1；1 &gt; 0 成立，打印 1，变 0；0 &gt; 0 不成立，循环停下，接着打印「开始」。所以输出是 3、2、1、「开始」，一共打印 4 次。</p><p><b>容易错：</b>循环里必须有让条件变假的更新——删掉 <code>count = count - 1</code>，条件永远成立，程序会一直打印 3 停不下来，这就是死循环；条件一开始就不成立时，<code>while</code> 一次都不会执行。</p>", "coding": {"task": "用 while 循环：count 从 1 开始，小于等于 3 时打印它，然后加 1。", "starter": "count = 1\n# 写 while 循环，别忘了让 count 变化\n", "expected": ["1", "2", "3"]}}, {"stage": 0, "title": "列表入门：一排格子存数据", "mins": 25, "intro": "列表用 [] 把一串数据排好队。取数靠下标：从 0 开始数，prices[0] 是第一个；len() 数一共有几个。", "code": "prices = [19.82, 14.24, 21.02]\nprint(prices[0])\nprint(len(prices))", "out": ["19.82", "3"], "tip": "下标从 0 开始数，prices[0] 是第一个。", "quiz": [{"q": "prices[2] 是哪个数？", "opts": ["14.24", "21.02", "不存在"], "ans": 1, "why": "下标 0、1、2 分别对应三个数，[2] 是第三个 21.02。"}, {"q": "prices[-1] 表示？", "opts": ["第一个", "最后一个", "报错"], "ans": 1, "why": "负下标从尾巴数，-1 是最后一个。"}, {"q": "想取最后一个又不数个数，用？", "opts": ["prices[len]", "prices[-1]", "prices[0]"], "ans": 1, "why": "prices[-1] 永远是最后一个元素。"}], "gi": 13, "diff": 2, "explain": "<p><b>是什么：</b>列表就是一排格子，用方括号装起来，一次存好多个数据：<code>prices = [19.82, 14.24, 21.02]</code> 把三笔金额存在一个变量里，比起三个单独的变量，循环、求和、排序都方便得多。</p><p><b>代码怎么读：</b>想取某一个，用下标：<code>prices[0]</code> 是第一个 19.82。下标从 0 开始数，这是新手最容易数错的地方；<code>len(prices)</code> 返回长度 3。负下标是从尾巴往回数，<code>prices[-1]</code> 就是最后一个 21.02。</p><p><b>容易错：</b><code>prices[2]</code> 是 21.02，不是 19.82——下标 2 是第三个；下标超出范围会报 <code>IndexError</code>；列表里的元素可以是不同类型，但一课里先养成「一列只装同类数据」的习惯，后面才不容易乱。</p>", "coding": {"task": "打印 prices 的第二个元素（下标 1），再打印列表长度。", "starter": "prices = [19.82, 14.24, 21.02]\n# 打印第二个元素和长度\n", "expected": ["14.24", "3"]}}, {"stage": 0, "title": "列表进阶：增删与排序", "mins": 25, "intro": "append() 在末尾加一个；sort() 直接把原列表从小到大排好。很多列表方法是「就地修改」，不返回新列表。", "code": "prices = [14.24, 19.82]\nprices.append(21.02)\nprices.sort()\nprint(prices)", "out": ["[14.24, 19.82, 21.02]"], "tip": "sort() 直接改原列表，从小到大排好。", "quiz": [{"q": "append 之后列表长度变成？", "opts": ["2", "3", "不确定"], "ans": 1, "why": "原来 2 个，加 1 个变 3 个。"}, {"q": "sort() 之后 prices 本身？", "opts": ["不变，要另存", "已经被排好序", "被清空"], "ans": 1, "why": "sort() 是就地修改原列表。"}, {"q": "想从大到小排，用？", "opts": ["sort(big)", "sort(reverse=True)", "sort(-1)"], "ans": 1, "why": "给 sort 传 reverse=True 就是降序。"}], "gi": 14, "diff": 3, "explain": "<p><b>是什么：</b>列表不只是装数据，还能随时改：<code>append()</code> 往末尾加一个，<code>sort()</code> 把顺序排好。它们是「方法」，写法是在列表后面加个点，再写方法名和括号。</p><p><b>代码怎么读：</b><code>prices</code> 一开始是 [14.24, 19.82]，<code>append(21.02)</code> 后变成 [14.24, 19.82, 21.02]，长度 3；<code>sort()</code> 把它排成 [14.24, 19.82, 21.02]，再打印出来。想从大到小排，写 <code>sort(reverse=True)</code>。</p><p><b>容易错：</b><code>sort()</code> 是直接改原列表本身，不会返回一个排好的新列表——写成 <code>prices = prices.sort()</code> 会得到 <code>None</code>，原列表反而被清空成这个结果；记住：凡是「直接改原地」的方法，都别再用等号接它的返回值。</p>", "coding": {"task": "给 prices 追加 19.82，再排序，最后打印整个列表。", "starter": "prices = [21.02, 14.24]\n# append、sort、print\n", "expected": ["[14.24, 19.82, 21.02]"]}}, {"stage": 0, "title": "字典：按键找值", "mins": 30, "intro": "字典用「键: 值」存数据，取值靠键不用靠位置：meal[\"price\"] 直接拿到价格。键就像标签，顺序不重要。", "code": "meal = {\"name\": \"牛肉饭\", \"price\": 21.02}\nprint(meal[\"name\"])\nprint(meal[\"price\"])", "out": ["牛肉饭", "21.02"], "tip": "字典用「键」取值，不是按第几个位置。", "quiz": [{"q": "meal[0] 能拿到第一个值吗？", "opts": ["能", "不能，会报错", "拿到键"], "ans": 1, "why": "字典没有 0 这个键，用不存在的键取值会报错。"}, {"q": "给字典加一项「qty: 2」怎么写？", "opts": ["meal.add(\"qty\", 2)", "meal[\"qty\"] = 2", "meal + \"qty\""], "ans": 1, "why": "直接给新键赋值就是新增。"}, {"q": "字典和列表最大的区别是？", "opts": ["字典能存更多", "字典按键取值，列表按位置", "字典不能改"], "ans": 1, "why": "存取方式不同：键 vs 下标。"}], "gi": 15, "diff": 3, "explain": "<p><b>是什么：</b>字典是按键找值的数据：花括号里写一对对「键：值」，比如 <code>{\"name\": \"牛肉饭\", \"price\": 21.02}</code>。列表是按位置（第几个）找东西，字典是按名字（哪个键）找东西，记一笔账、一份问卷答卷，用字典最贴切。</p><p><b>代码怎么读：</b><code>meal[\"name\"]</code> 拿到「牛肉饭」，<code>meal[\"price\"]</code> 拿到 21.02。想加一项就直接赋值：<code>meal[\"qty\"] = 2</code>，字典里就多了一个键；想改值也是同一个写法。</p><p><b>容易错：</b><code>meal[0]</code> 拿不到第一个值——字典没有「第几个」的概念，用数字下标会报错；键不能重复，重复写同一个键，后面的值会覆盖前面的；键一般用字符串，写错一个字就找不到对应的值。</p>", "coding": {"task": "先打印 meal 的 price；再给它加一项 qty = 2，并打印 qty。", "starter": "meal = {\"name\": \"牛肉饭\", \"price\": 21.02}\n# 取值、加一项、再取值\n", "expected": ["21.02", "2"]}}, {"stage": 0, "title": "函数入门：把代码打包复用", "mins": 30, "intro": "def 定义函数，把一段逻辑打包起个名字；要用时调用它。return 把算好的结果交回给调用的地方。", "code": "def total(prices):\n    s = 0\n    for p in prices:\n        s = s + p\n    return s\n\nprint(total([19.82, 14.24]))", "out": ["34.06"], "tip": "return 把算好的结果交回给调用它的地方。", "quiz": [{"q": "total([19.82, 14.24]) 里 [19.82, 14.24] 是？", "opts": ["返回值", "传给函数的参数", "函数名"], "ans": 1, "why": "调用时括号里的是参数，传进函数给 prices。"}, {"q": "函数里没有 return，调用它得到？", "opts": ["0", "None", "报错"], "ans": 1, "why": "没有 return 时默认返回 None。"}, {"q": "定义函数用哪个关键字？", "opts": ["func", "def", "function"], "ans": 1, "why": "Python 用 def 定义函数。"}], "gi": 16, "diff": 3, "explain": "<p><b>是什么：</b>函数就是把一段代码打包、起个名字，以后想用就调用它。同样是算总和，写成函数 <code>total(prices)</code> 之后，换一份账单再算一次，只用再调用一次，不用把循环重写一遍。</p><p><b>代码怎么读：</b><code>def total(prices):</code> 是定义，<code>prices</code> 是参数——调用时传进来的数据；函数体里用循环把每一笔加进 <code>s</code>，<code>return s</code> 把算好的结果交回给调用的地方；<code>print(total([19.82, 14.24]))</code> 调用它，得到 34.06 再显示。</p><p><b>容易错：</b>只定义不调用，函数体一行都不会执行；函数里没有 <code>return</code>，调用它得到的是 <code>None</code>，不是 0；定义用 <code>def</code>，调用时名字后面一定要加括号，漏了括号就只是提到这个函数，没有真的运行它。</p>", "coding": {"task": "定义函数 total(prices)，返回列表总和；然后打印 total([19.82, 14.24])。", "starter": "# 定义 total 函数，再调用它\n", "expected": ["34.06"]}}, {"stage": 0, "title": "函数进阶：参数与返回值", "mins": 30, "intro": "参数是函数的输入，返回值是输出。函数内部的变量是局部的，外面看不见——想把结果拿出来，只能靠 return。", "code": "def pay(amount, count):\n    total = amount * count\n    return total\n\nmoney = pay(21.02, 2)\nprint(money)", "out": ["42.04"], "tip": "函数里的 total 是局部的，外面只能靠 return 拿到。", "quiz": [{"q": "pay(21.02, 2) 中两个参数的顺序对应？", "opts": ["count 先，amount 后", "amount 先，count 后", "无所谓"], "ans": 1, "why": "按定义顺序一一对应：amount=21.02，count=2。"}, {"q": "在函数外面 print(total) 会怎样？", "opts": ["显示 42.04", "报错，total 是局部变量", "显示 None"], "ans": 1, "why": "total 只在函数内部存在。"}, {"q": "一个函数可以 return 几个值？", "opts": ["只能 1 个", "可以多个（打包成元组）", "不能 return"], "ans": 1, "why": "return a, b 会把多个值打包返回。"}], "gi": 17, "diff": 3, "explain": "<p><b>是什么：</b>函数进阶要分清三件事：参数怎么传、返回值怎么接、变量在哪里有效。<code>pay(amount, count)</code> 收两个数，算好乘积再交回来，调用的人拿到结果才能继续用。</p><p><b>代码怎么读：</b>调用 <code>pay(21.02, 2)</code> 时，两个数按顺序对上参数：<code>amount</code> 是 21.02，<code>count</code> 是 2；函数里 <code>total = amount * count</code> 得 42.04，<code>return total</code> 交回来，存进 <code>money</code> 再打印。函数里的 <code>total</code> 是局部变量，只在函数内部有效。</p><p><b>容易错：</b>在函数外面写 <code>print(total)</code> 会报错，因为那个 <code>total</code> 只活在函数里，外面看不见；想把结果带出来，唯一的正路就是 <code>return</code>；参数顺序传错了，算出来的数也会跟着错。</p>", "coding": {"task": "定义函数 pay(amount, count)，返回 amount * count；打印 pay(21.02, 2)。", "starter": "# 定义 pay 函数，再调用\n", "expected": ["42.04"]}}, {"stage": 0, "title": "综合项目：迷你记账本", "mins": 50, "intro": "把学过的拼起来：列表存每一笔，for 循环逐笔累加，f-string 输出汇总——这就是记账本的核心骨架。", "code": "records = [19.82, 14.24, 21.02]\ntotal = 0\nfor r in records:\n    total = total + r\nprint(f\"共 {len(records)} 笔，总支出 {total} 元\")", "out": ["共 3 笔，总支出 55.08 元"], "tip": "记账本的核心就是列表存记录、循环逐笔累加。", "quiz": [{"q": "总支出 55.08 是怎么来的？", "opts": ["19.82 + 14.24 + 21.02", "三个数相乘", "len 算出来的"], "ans": 0, "why": "循环把三笔逐笔加进 total。"}, {"q": "想多记一笔 9.9，应该改哪里？", "opts": ["改 total 初值", "往 records 列表里加 9.9", "改 print"], "ans": 1, "why": "数据都在 records 里，加一笔即可，汇总自动更新。"}, {"q": "len(records) 在输出里负责显示什么？", "opts": ["总金额", "一共几笔", "最大一笔"], "ans": 1, "why": "len 数的是列表里元素的个数。"}], "gi": 18, "diff": 4, "explain": "<p><b>是什么：</b>综合项目就是把前面学过的东西拼起来用：迷你记账本的核心只有两招——列表存记录，循环逐笔累加，再用 f-string 拼出一句汇总。能拼出来，就说明前面的课真的会用了。</p><p><b>代码怎么读：</b><code>records = [19.82, 14.24, 21.02]</code> 存三笔账；<code>total</code> 先置 0，循环让 <code>r</code> 逐个取到每一笔，加进 <code>total</code>，最后是 55.08；<code>len(records)</code> 数出 3 笔，f-string 拼成「共 3 笔，总支出 55.08 元」。</p><p><b>容易错：</b>想多记一笔，只改 <code>records</code> 列表就行，循环和打印不用动——这正是用列表的好处；累加器 <code>total</code> 忘记先置 0，第一次相加就会报错；f-string 里 <code>{len(records)}</code> 的花括号别漏了 <code>f</code>。</p>", "coding": {"task": "用循环把 records 逐笔累加，最后用 f-string 打印：共 3 笔，总支出 55.08 元（笔数要用 len 算）。", "starter": "records = [19.82, 14.24, 21.02]\ntotal = 0\n# 循环累加，再用 f-string 打印汇总\n", "expected": ["共 3 笔，总支出 55.08 元"]}}, {"stage": 1, "title": "字符串方法：split 与伙伴们", "mins": 25, "intro": "split() 按分隔符把字符串切成列表，是处理账单文本、CSV 行的第一步。切完每一段都还是字符串，要算数先转换。", "code": "line = \"午餐,19.82\"\nparts = line.split(\",\")\nprint(parts)\nprint(parts[1])", "out": ["['午餐', '19.82']", "19.82"], "tip": "split 切完每段都是字符串，金额要用时先转 float。", "quiz": [{"q": "\"a-b-c\".split(\"-\") 的结果是？", "opts": ["\"abc\"", "['a', 'b', 'c']", "['a-b-c']"], "ans": 1, "why": "按 - 切开，得到三个字符串组成的列表。"}, {"q": "parts[1] + 1 会怎样？", "opts": ["得到 20.82", "报错，字符串不能和数字相加", "得到 \"19.821\""], "ans": 1, "why": "parts[1] 是字符串 \"19.82\"，要先 float() 才能计算。"}, {"q": "去掉字符串两头空格用？", "opts": ["strip()", "cut()", "trim()"], "ans": 0, "why": "Python 里是 strip()。"}], "gi": 19, "diff": 2, "explain": "<p><b>是什么：</b>字符串自带很多方法，<code>split()</code> 是其中最常用的一个：按指定的分隔符把一段文字切成列表。一行「午餐,19.82」这样的账单文本，切开就变成了能分别处理的项目名和金额。</p><p><b>代码怎么读：</b><code>line.split(\",\")</code> 按逗号切，得到 <code>['午餐', '19.82']</code>；<code>parts[1]</code> 取到第二段 <code>'19.82'</code>。方法是用点调用的：<code>line.split(\",\")</code> 的意思，是「对 <code>line</code> 这个字符串做切分」。</p><p><b>容易错：</b>切完的每一段都还是字符串，<code>parts[1] + 1</code> 会报错，想计算要先 <code>float(parts[1])</code>；字符串两头常有空格，先用 <code>strip()</code> 去掉再处理，否则比较和分组都会认错。</p>", "coding": {"task": "把 line 按逗号切开：打印第一段（项目名），再把第二段转成小数加 1 后打印。", "starter": "line = \"晚餐,14.24\"\n# split 切开，分别处理\n", "expected": ["晚餐", "15.24"]}}, {"stage": 1, "title": "文件读写：把数据存下来", "mins": 25, "intro": "with open(...) as f 是读写文件的标准姿势：模式 \"w\" 写入（会覆盖），\"a\" 追加，\"r\" 读取。用 with 就不用手动关文件。", "code": "with open(\"note.txt\", \"w\") as f:\n    f.write(\"牛肉饭 21.02\")\nprint(\"已保存\")", "out": ["已保存"], "tip": "模式 \"w\" 会覆盖原文件，想追加要用 \"a\"。", "quiz": [{"q": "用 \"w\" 打开已有文件写入会？", "opts": ["在末尾追加", "覆盖原内容", "报错"], "ans": 1, "why": "\"w\" 是覆盖写，想保留旧内容用 \"a\"。"}, {"q": "with open 的好处是？", "opts": ["读得更快", "用完自动关闭文件", "不用写文件名"], "ans": 1, "why": "with 代码块结束时自动 close。"}, {"q": "读取整个文件内容用？", "opts": ["f.read()", "f.open()", "f.get()"], "ans": 0, "why": "以 \"r\" 模式打开后用 f.read()。"}], "gi": 20, "diff": 3, "explain": "<p><b>是什么：</b>程序算出的数据，总要找个地方存下来，下次打开还能接着用。文件读写就是这个本事：<code>open()</code> 打开文件，<code>write()</code> 写进去，<code>read()</code> 读出来，配上 <code>with</code>，用完会自动关好文件。</p><p><b>代码怎么读：</b><code>with open(\"note.txt\", \"w\") as f:</code> 以「写」模式打开文件，<code>f.write(\"牛肉饭 21.02\")</code> 把文字写进去，离开 <code>with</code> 的范围文件就自动关闭；最后打印「已保存」。读的时候把 <code>\"w\"</code> 换成 <code>\"r\"</code>，用 <code>f.read()</code> 拿回整段内容。</p><p><b>容易错：</b><code>\"w\"</code> 模式打开已有文件会把原内容整个覆盖，想追加要用 <code>\"a\"</code>；<code>write()</code> 只能写字符串，写数字要先转成文字；不用 <code>with</code> 时，写完必须自己 <code>close()</code>，否则数据可能还留在缓存里没真正落盘。</p>", "coding": {"task": "用 with open 把「牛肉饭 21.02」写进 note.txt，然后再读出来打印。", "starter": "# 先用 \"w\" 写入，再用 \"r\" 读出并打印\n", "expected": ["牛肉饭 21.02"]}}, {"stage": 1, "title": "异常处理：出错也不崩", "mins": 25, "intro": "try 把可能出错的代码包起来，出错时跳去 except 执行补救，程序不会直接崩掉。except 后面写明接哪种错误更稳妥。", "code": "try:\n    price = float(\"abc\")\nexcept ValueError:\n    print(\"这不是数字\")", "out": ["这不是数字"], "tip": "except 只接得住指定类型的错误，这里是 ValueError。", "quiz": [{"q": "float(\"abc\") 抛出的错误类型是？", "opts": ["TypeError", "ValueError", "KeyError"], "ans": 1, "why": "值不合法是 ValueError。"}, {"q": "try 里的代码没出错时，except 会执行吗？", "opts": ["会", "不会", "随机"], "ans": 1, "why": "except 只在出错被触发时执行。"}, {"q": "程序遇到错误直接崩掉的坏处是？", "opts": ["没坏处", "后面的保存、提示都做不了", "跑得慢"], "ans": 1, "why": "崩溃会中断整个流程，异常处理能优雅补救。"}], "gi": 21, "diff": 3, "explain": "<p><b>是什么：</b>真实数据常常不干净：用户可能输入「abc」当金额，文件可能少了一列。异常处理就是给程序准备一句「万一出错怎么办」：<code>try</code> 包住可能出错的代码，<code>except</code> 写好出错时的退路，程序就不会一出错就整个崩掉。</p><p><b>代码怎么读：</b><code>try</code> 里尝试 <code>float(\"abc\")</code>，转换失败，抛出 <code>ValueError</code>；<code>except ValueError:</code> 接住这种错误，打印「这不是数字」。如果 <code>try</code> 里的代码没出错，<code>except</code> 那段根本不会执行。</p><p><b>容易错：</b><code>except</code> 要写清楚接哪种错误，只接你预料到的类型，比如这里的 <code>ValueError</code>；写得太宽会把真正的 bug 也悄悄吞掉，以后更难找；有了退路之后，也别忘了在提示里告诉用户该怎么修正输入。</p>", "coding": {"task": "用 try / except：尝试 float(\"12a\")，出错时打印「格式不对」。", "starter": "# 用 try 包住转换，except ValueError 时打印提示\n", "expected": ["格式不对"]}}, {"stage": 1, "title": "标准库：datetime 与日期", "mins": 20, "intro": "标准库是 Python 自带的工具箱，import 就能用。datetime 处理日期：weekday() 里周一是 0、周日是 6，别记反。", "code": "import datetime\ntoday = datetime.date(2026, 11, 18)\nprint(today)\nprint(today.weekday())", "out": ["2026-11-18", "2"], "tip": "weekday() 里周一是 0，所以周三是 2。", "quiz": [{"q": "2026-11-18 是周三，weekday() 是 2，因为？", "opts": ["周三排第三", "周一是 0 起数", "从周日算"], "ans": 1, "why": "weekday 以周一为 0：周一0、周二1、周三2。"}, {"q": "用标准库之前要先做什么？", "opts": ["付费", "import 导入", "重启程序"], "ans": 1, "why": "import 进来才能用，不用另外安装。"}, {"q": "想生成随机数用哪个库？", "opts": ["random", "math", "os"], "ans": 0, "why": "random 是标准库里的随机工具箱。"}], "gi": 22, "diff": 2, "explain": "<p><b>是什么：</b>标准库是 Python 自带的工具箱，不用安装，<code>import</code> 进来就能用。<code>datetime</code> 是管日期和时间的那个：造日期、看星期几、算两个日期差几天，都靠它。</p><p><b>代码怎么读：</b><code>import datetime</code> 先把工具箱拿进来；<code>datetime.date(2026, 11, 18)</code> 造出 2026 年 11 月 18 日这个日期；<code>print(today)</code> 显示 2026-11-18；<code>today.weekday()</code> 返回 2——因为 <code>weekday()</code> 里周一是 0，所以周三是 2。</p><p><b>容易错：</b>用标准库之前一定要先 <code>import</code>，没导入就直接写 <code>datetime.date</code> 会报 <code>NameError</code>；<code>weekday()</code> 的 0 是周一不是周日，数星期几时别按日常生活从周日开始数；日期之间可以直接比较大小，判断先后不用自己换算。</p>", "coding": {"task": "用 datetime 建 2026 年 11 月 19 日，打印日期，再打印它的 weekday()。", "starter": "import datetime\n# 建日期并打印\n", "expected": ["2026-11-19", "3"]}}, {"stage": 1, "title": "CSV：表格数据怎么读", "mins": 25, "intro": "CSV 是用逗号分隔的表格文件。csv.reader 逐行读进来，每行是一个列表；注意第一行通常是表头，不是数据。", "code": "import csv\n\nwith open(\"meals.csv\") as f:\n    rows = list(csv.reader(f))\nprint(rows[0])\nprint(len(rows))", "out": ["['日期', '项目', '金额']", "4"], "tip": "rows[0] 是第一行，也就是表头，不是数据。", "quiz": [{"q": "len(rows) 是 4，说明文件里有几行数据（除表头）？", "opts": ["4 行", "3 行", "5 行"], "ans": 1, "why": "4 行里 1 行是表头，真正数据 3 行。"}, {"q": "csv.reader 读到的金额是什么类型？", "opts": ["小数", "字符串", "整数"], "ans": 1, "why": "CSV 读进来的全是字符串，要计算先转换。"}, {"q": "读 CSV 前要先 import 什么？", "opts": ["import csv", "import table", "import excel"], "ans": 0, "why": "标准库 csv 就是干这个的。"}], "gi": 23, "diff": 3, "explain": "<p><b>是什么：</b>CSV 是最常见的表格文件格式：纯文本，一行一条记录，列之间用逗号隔开。账单、问卷结果、成绩表导出后常常就是 CSV，学会读它，就等于能处理真实世界里的大部分表格数据。</p><p><b>代码怎么读：</b><code>import csv</code> 后，用 <code>with open(\"meals.csv\") as f</code> 打开文件，<code>csv.reader(f)</code> 逐行读，再用 <code>list(...)</code> 把所有行收进一个列表 <code>rows</code>。每行本身也是一个列表；<code>rows[0]</code> 是第一行，也就是表头 ['日期', '项目', '金额']，<code>len(rows)</code> 是 4，说明文件一共 4 行。</p><p><b>容易错：</b><code>rows[0]</code> 是表头不是数据，算总数、求和时要从 <code>rows[1]</code> 开始，不然会把「金额」两个字也当成一笔账；读出来的金额是字符串，要计算先转 <code>float</code>；读 CSV 前别忘了 <code>import csv</code>。</p>", "coding": {"task": "meals.csv 已经准备好（就是课上那份账单）。用 csv.reader 读进来，打印第二行（rows[1]，第一笔数据）。", "starter": "import csv\n\nwith open(\"meals.csv\") as f:\n    rows = list(csv.reader(f))\n# 打印 rows[1]\n", "expected": ["['2026-11-17', '午餐', '19.82']"], "files": ["meals.csv"]}}, {"stage": 1, "title": "列表推导式：一行写循环", "mins": 20, "intro": "[p for p in prices if p > 15] 把「循环 + 筛选」压成一行：先遍历、再过滤、把留下的组成新列表。太复杂时别硬写。", "code": "prices = [19.82, 14.24, 21.02]\nbig = [p for p in prices if p > 15]\nprint(big)", "out": ["[19.82, 21.02]"], "tip": "推导式是循环加筛选压成一行，太复杂就别硬写。", "quiz": [{"q": "14.24 为什么不在结果里？", "opts": ["它不是数字", "if p > 15 把它筛掉了", "列表太短"], "ans": 1, "why": "14.24 不大于 15，被条件过滤。"}, {"q": "[x * 2 for x in [1, 2, 3]] 的结果是？", "opts": ["[1, 2, 3]", "[2, 4, 6]", "[2, 2, 2]"], "ans": 1, "why": "每个元素乘 2 后组成新列表。"}, {"q": "推导式和普通 for 相比？", "opts": ["功能更强", "只是写法更紧凑", "跑得快十倍"], "ans": 1, "why": "本质一样，胜在简洁，别为了用而用。"}], "gi": 24, "diff": 3, "explain": "<p><b>是什么：</b>列表推导式是把「循环 + 筛选」压成一行的写法：<code>[p for p in prices if p &gt; 15]</code> 一行就做完「遍历、判断、收集」三件事。它和普通 <code>for</code> 循环做的事完全一样，只是写得更紧凑。</p><p><b>代码怎么读：</b>从右往左拆：<code>for p in prices</code> 逐个取出每一笔，<code>if p &gt; 15</code> 只留下大于 15 的，最左边的 <code>p</code> 是留下来后放进新列表的样子。19.82 和 21.02 通过，14.24 被筛掉，结果是 [19.82, 21.02]。</p><p><b>容易错：</b>推导式只是写法更紧凑，不是更快、也不是更高级——条件一复杂就别硬写，写回普通 <code>for</code> 循环更清楚；方括号别漏，写成圆括号就变成另一种东西了。</p>", "coding": {"task": "用列表推导式，从 prices 里筛出大于 15 的，打印结果。", "starter": "prices = [19.82, 14.24, 21.02]\n# 一行推导式搞定\n", "expected": ["[19.82, 21.02]"]}}, {"stage": 1, "title": "综合项目：问卷统计", "mins": 40, "intro": "问卷数据常存成字典：选项是键、人数是值。sum(values()) 算总数，再算占比、round 保留一位小数，就是一份统计。", "code": "counts = {\"满意\": 42, \"一般\": 14, \"不满意\": 7}\ntotal = sum(counts.values())\nrate = round(counts[\"满意\"] / total * 100, 1)\nprint(total, rate)", "out": ["63 66.7"], "tip": "算占比先算总数，round(…, 1) 保留一位小数。", "quiz": [{"q": "total 为什么是 63？", "opts": ["42 + 14 + 7", "数了字典的键", "round 算的"], "ans": 0, "why": "sum 把三个选项的人数加总。"}, {"q": "66.7 是怎么来的？", "opts": ["42 / 63 × 100 四舍五入一位", "42 + 24.7", "直接数出来的"], "ans": 0, "why": "满意占比 = 42/63 ≈ 66.7%。"}, {"q": "counts.values() 拿到的是？", "opts": ["所有键", "所有值（人数）", "键值对文字"], "ans": 1, "why": "values() 取字典全部的值。"}], "gi": 25, "diff": 4, "explain": "<p><b>是什么：</b>问卷统计是最典型的「先汇总、再算占比」：字典存每档的人数，<code>sum()</code> 求总数，再用「部分 ÷ 总数 × 100」算出百分比。做管理学问卷、统计调查结果，用的就是这套路子。</p><p><b>代码怎么读：</b><code>counts = {\"满意\": 42, \"一般\": 14, \"不满意\": 7}</code>；<code>counts.values()</code> 拿到所有人数 [42, 14, 7]，<code>sum(...)</code> 得总数 63；<code>counts[\"满意\"] / total * 100</code> 是 42 ÷ 63 × 100 = 66.666…，<code>round(..., 1)</code> 保留一位小数得 66.7；最后 <code>print(total, rate)</code> 显示「63 66.7」。</p><p><b>容易错：</b>算占比之前一定要先算总数，拿单个数字直接除是没意义的；<code>round()</code> 的第二个参数是保留几位小数，<code>round(x, 1)</code> 是一位；<code>print</code> 里用逗号分隔的两项，输出时中间会自动加一个空格。</p>", "coding": {"task": "算出总人数 total，再算「满意」占比 rate（保留一位小数），用 print(total, rate) 一行打印。", "starter": "counts = {\"满意\": 42, \"一般\": 14, \"不满意\": 7}\n# 算 total 和 rate，再打印\n", "expected": ["63 66.7"]}}, {"stage": 2, "title": "pandas 入门：读表与求和", "mins": 30, "intro": "pandas 是处理表格的神器：read_csv 一行把 CSV 读成表，df[\"金额\"] 取一整列，.sum() 直接加总——记账统计一步到位。", "code": "import pandas as pd\n\ndf = pd.read_csv(\"meals.csv\")\nprint(df[\"金额\"].sum())", "out": ["55.08"], "tip": "df[\"金额\"] 按列名取一整列，sum() 把它加总。", "quiz": [{"q": "55.08 是哪三笔的和？", "opts": ["19.82 + 14.24 + 21.02", "只有最大一笔", "表头加数据"], "ans": 0, "why": "金额列三行加总正好是 55.08。"}, {"q": "import pandas as pd 里 pd 是？", "opts": ["新库名", "给 pandas 起的简称", "变量"], "ans": 1, "why": "as pd 是起别名，后面写 pd 更省事。"}, {"q": "想看金额列最大一笔用？", "opts": ["df[\"金额\"].max()", "df.max(\"金额\")", "max(df)"], "ans": 0, "why": "先取列，再对列调 .max()。"}], "gi": 26, "diff": 3, "explain": "<p><b>是什么：</b>pandas 是处理表格的神器，核心对象叫 DataFrame，就是一张内存里的表。<code>pd.read_csv(\"meals.csv\")</code> 一行把 CSV 读成表，<code>df[\"金额\"]</code> 按列名取一整列，<code>.sum()</code> 直接加总——以前要写循环做的事，现在一行就够。</p><p><b>代码怎么读：</b><code>import pandas as pd</code> 里 <code>pd</code> 是大家约定的简称；读表后 <code>df[\"金额\"]</code> 拿到金额那一列，<code>.sum()</code> 把 19.82 + 14.24 + 21.02 加起来，得到 55.08。列名要用方括号加引号写清楚，写错一个字就找不到那一列。</p><p><b>容易错：</b>金额列必须是数字才能求和——如果 CSV 里混进了文字，<code>sum()</code> 会报错或给出奇怪的结果，先检查列的类型；想看最大一笔用 <code>.max()</code>，平均用 <code>.mean()</code>，都是同一列后面换个方法名。</p>", "coding": {"task": "meals.csv 已经准备好。用 pandas 读进来，打印金额列的总和。", "starter": "import pandas as pd\n\n# 读表，打印金额总和\n", "expected": ["55.08"], "pkgs": ["pandas"], "files": ["meals.csv"]}}, {"stage": 2, "title": "pandas 分组：groupby 汇总", "mins": 30, "intro": "groupby 是 Excel 数据透视表的代码版：先按「项目」分组，再对每组的「金额」求和，一行代码出分类汇总。", "code": "import pandas as pd\ndf = pd.read_csv(\"meals.csv\")\nprint(df.groupby(\"项目\")[\"金额\"].sum())", "out": ["项目", "午餐     19.82", "晚餐     14.24", "牛肉饭    21.02", "Name: 金额, dtype: float64"], "tip": "groupby 先按项目分组，再对每组的金额求和。", "quiz": [{"q": "groupby(\"项目\") 是按什么分组？", "opts": ["按金额大小", "按项目这一列的值", "按行号"], "ans": 1, "why": "相同项目名的行被分到同一组。"}, {"q": "如果同一项目有两行，分组求和会？", "opts": ["只留第一行", "两行加在一起", "报错"], "ans": 1, "why": "分组的意义就是把同类合并汇总。"}, {"q": "把 .sum() 换成 .mean() 会得到？", "opts": ["每组平均金额", "每组笔数", "总和不变"], "ans": 0, "why": "mean 是求平均，换聚合函数就行。"}], "gi": 27, "diff": 4, "explain": "<p><b>是什么：</b><code>groupby</code> 是「先分组、再对每组聚合」：按某一列的值把行分成几组，再对每组分别求和、求平均。想知道每个项目各花了多少钱、每个类别各花了多少，靠的就是它。</p><p><b>代码怎么读：</b><code>df.groupby(\"项目\")[\"金额\"].sum()</code> 拆成三步：按「项目」这一列分组，取出每组的「金额」列，对每组求和。课上的表里每个项目只有一行，所以结果就是午餐 19.82、晚餐 14.24、牛肉饭 21.02；如果同一项目有两行，分组求和会把两行加在一起。</p><p><b>容易错：</b>分组列写错名字，分出来的组就全错了；把 <code>.sum()</code> 换成 <code>.mean()</code>，得到的就是每组平均金额——聚合方法决定了答案的含义，换方法之前先想清楚自己要的是总和还是平均。</p>", "coding": {"task": "按「项目」分组求和后，打印其中「午餐」这一组的总和。", "starter": "import pandas as pd\ndf = pd.read_csv(\"meals.csv\")\n# groupby 后取「午餐」组的总和打印\n", "expected": ["19.82"], "pkgs": ["pandas"], "files": ["meals.csv"]}}, {"stage": 2, "title": "matplotlib：画一张柱状图", "mins": 25, "intro": "matplotlib 把数字变成图：plt.bar(横轴, 高度) 画柱子，plt.savefig 把图存成图片文件。先画、再存，顺序别反。", "code": "import matplotlib.pyplot as plt\ndays = [\"一\", \"二\", \"三\"]\ncosts = [33.06, 21.02, 25.5]\nplt.bar(days, costs)\nplt.savefig(\"chart.png\")\nprint(\"图表已保存\")", "out": ["图表已保存"], "tip": "先 bar 画好、再 savefig 存成图片文件。", "quiz": [{"q": "plt.bar 的两个参数分别是？", "opts": ["标题和颜色", "类别和数值", "文件名和格式"], "ans": 1, "why": "第一个是横轴类别，第二个是每根柱子的高度。"}, {"q": "savefig 应该在画图之前还是之后？", "opts": ["之前", "之后", "无所谓"], "ans": 1, "why": "要先把图画出来，才能存下来。"}, {"q": "\"图表已保存\" 是谁打印的？", "opts": ["matplotlib 自动的", "代码最后的 print", "savefig 返回的"], "ans": 1, "why": "那是代码里自己写的 print 提示。"}], "gi": 28, "diff": 3, "explain": "<p><b>是什么：</b>matplotlib 是 Python 里画图的库，<code>plt.bar()</code> 画柱状图：第一个参数是类别，第二个参数是对应的数值。数字变成图，大小一眼就能比较，比盯着表格直观得多。</p><p><b>代码怎么读：</b><code>days = [\"一\", \"二\", \"三\"]</code> 是横轴的类别，<code>costs = [33.06, 21.02, 25.5]</code> 是每类的数值，<code>plt.bar(days, costs)</code> 画出三根柱子；<code>plt.savefig(\"chart.png\")</code> 把图存成图片文件；最后的 <code>print(\"图表已保存\")</code> 只是提示语，图本身是 <code>savefig</code> 存的。</p><p><b>容易错：</b>顺序不能反：先画图、后保存，<code>savefig</code> 写在 <code>bar</code> 之前会存出一张空图；类别和数值的个数要对得上，少一个多一个都会报错；只画图不保存，图就只留在内存里，关掉程序就没了。</p>", "coding": {"task": "用 matplotlib 画柱状图（days 和 costs 已给），存成 chart.png，最后打印「图表已保存」。判定会检查图文件是否真的生成。", "starter": "import matplotlib.pyplot as plt\ndays = [\"一\", \"二\", \"三\"]\ncosts = [33.06, 21.02, 25.5]\n# bar 画图，savefig 存文件，再打印提示\n", "expected": ["图表已保存"], "pkgs": ["matplotlib"], "checkFile": "chart.png"}}, {"stage": 2, "title": "综合项目：账本报告", "mins": 50, "intro": "终点站：读账本、算总支出、找最贵一笔——pandas 三行做出一份账本报告。学完这一课，整条路线就走通了。", "code": "import pandas as pd\ndf = pd.read_csv(\"meals.csv\")\nprint(\"总支出：\", df[\"金额\"].sum())\nprint(\"最贵一笔：\", df[\"金额\"].max())", "out": ["总支出： 55.08", "最贵一笔： 21.02"], "tip": "账本报告最常用就是 sum 求和、max 找最大一笔。", "quiz": [{"q": "「最贵一笔：21.02」里的 21.02 来自？", "opts": ["sum 的结果", "金额列的 max", "第一行数据"], "ans": 1, "why": ".max() 取金额列最大值，就是牛肉饭那笔。"}, {"q": "print 里用逗号分隔两项，输出时它们之间会？", "opts": ["紧贴着", "自动加一个空格", "换行"], "ans": 1, "why": "print 多个参数之间默认用空格分隔。"}, {"q": "想再加一行「平均每笔」，应该写？", "opts": ["df[\"金额\"].mean()", "df.mean[\"金额\"]", "sum / max"], "ans": 0, "why": "对金额列求平均用 .mean()。"}], "gi": 29, "diff": 4, "explain": "<p><b>是什么：</b>账本报告就是把前面 pandas 的几招拼成一份能看的汇总：读表、求总支出、找最贵一笔、打印出来。一份报告的骨架永远是这三步——读数据、算几个数、说清楚结果。</p><p><b>代码怎么读：</b><code>df[\"金额\"].sum()</code> 得总支出 55.08，<code>df[\"金额\"].max()</code> 得最贵一笔 21.02；两个 <code>print</code> 分别打印「总支出： 55.08」和「最贵一笔： 21.02」。注意 <code>print</code> 里用逗号分隔的两项，输出时中间会自动加一个空格。</p><p><b>容易错：</b>想再加一行「平均每笔」，写 <code>df[\"金额\"].mean()</code> 就行，不用重新读表；报告里的每个数字都要能说出来源——总支出是 <code>sum</code>，最贵是 <code>max</code>，数字和方法的对应关系别搞混。</p>", "coding": {"task": "meals.csv 已经准备好。打印两行报告：总支出和最贵一笔（格式照课上的来）。", "starter": "import pandas as pd\ndf = pd.read_csv(\"meals.csv\")\n# 打印总支出和最贵一笔\n", "expected": ["总支出： 55.08", "最贵一笔： 21.02"], "pkgs": ["pandas"], "files": ["meals.csv"]}}, {"stage": 3, "title": "文件与文件夹自动化：pathlib", "mins": 25, "intro": "整理文件不用手动一个个点：pathlib 能建文件夹、列出清单、按名字筛选。写这类脚本先想清楚三步：去哪个文件夹、找什么、找到后怎么处理。", "code": "from pathlib import Path\nfolder = Path(\"资料\")\nfolder.mkdir(exist_ok=True)\nfor name in [\"会计笔记.txt\", \"账单.csv\", \"照片.png\"]:\n    (folder / name).write_text(\"x\", encoding=\"utf-8\")\nnames = sorted(p.name for p in folder.iterdir())\nprint(len(names))\nprint(names)", "out": ["3", "['会计笔记.txt', '照片.png', '账单.csv']"], "tip": "iterdir() 列出文件夹里的每一项；sorted() 让清单顺序稳定，方便核对。", "quiz": [{"q": "folder.iterdir() 的作用是？", "opts": ["列出文件夹里的每一项", "删除整个文件夹", "给文件改名"], "ans": 0, "why": "iterdir() 逐个给出文件夹里的文件和子文件夹，常配合循环处理。"}, {"q": "Path(\"资料\") / \"a.txt\" 里的 / 是在做什么？", "opts": ["除法运算", "拼出文件夹里面的文件路径", "注释符号"], "ans": 1, "why": "Path 对象之间用 / 拼接路径，比手动拼字符串更不容易出错。"}, {"q": "write_text 写入一个已经存在的文件时，会？", "opts": ["报错", "覆盖原内容", "自动追加到末尾"], "ans": 1, "why": "write_text 是覆盖写；想追加内容，要用 open(..., \"a\") 模式。"}], "gi": 30, "diff": 3, "explain": "<p><b>是什么：</b>pathlib 是 Python 里处理文件和文件夹的现代写法：<code>Path(\"资料\")</code> 代表一个路径，路径之间用斜杠 <code>/</code> 拼接，比字符串拼路径更稳、也更不容易写错。批量建文件、列清单、按类型统计，都靠它。</p><p><b>代码怎么读：</b><code>folder = Path(\"资料\")</code>，<code>folder.mkdir(exist_ok=True)</code> 建文件夹（已存在也不报错）；循环里 <code>(folder / name).write_text(\"x\", encoding=\"utf-8\")</code> 在文件夹里写三个文件；<code>folder.iterdir()</code> 列出每一项，<code>sorted(...)</code> 让顺序稳定，数出来是 3 个，名字是 ['会计笔记.txt', '照片.png', '账单.csv']。</p><p><b>容易错：</b><code>Path(\"资料\") / \"a.txt\"</code> 里的 <code>/</code> 是在拼路径，不是除法；<code>write_text</code> 写已存在的文件会覆盖原内容；中文文件名要写 <code>encoding=\"utf-8\"</code>，否则在有的电脑上会乱码或报错。</p>", "coding": {"task": "在「练习」文件夹里建三个文件：a.txt、b.csv、c.txt（内容随便写一个字符），然后打印两行：文件总数、其中 .txt 文件的个数。", "starter": "from pathlib import Path\n# 建文件夹和三个文件，再统计\n", "expected": ["3", "2"]}}, {"stage": 3, "title": "Excel 实战：openpyxl 读写成绩表", "mins": 30, "intro": "会计工作离不开 Excel。openpyxl 能直接读写 .xlsx：append 一行就是一行数据，ws[\"B2\"] 就能取到单元格。注意：公式要先用 Python 算好再写入数值，openpyxl 本身不负责计算公式。", "code": "from openpyxl import Workbook, load_workbook\nwb = Workbook()\nws = wb.active\nws.title = \"成绩表\"\nws.append([\"姓名\", \"数学\", \"英语\"])\nws.append([\"小林\", 88, 92])\nws.append([\"小周\", 95, 85])\nwb.save(\"scores.xlsx\")\nwb2 = load_workbook(\"scores.xlsx\")\nws2 = wb2[\"成绩表\"]\nprint(ws2[\"A1\"].value, ws2[\"B1\"].value)\nprint(ws2[\"A2\"].value, ws2[\"B2\"].value + ws2[\"C2\"].value)", "out": ["姓名 数学", "小林 180"], "tip": "append 按行追加最省事；读回时用 .value 取单元格里的值。", "quiz": [{"q": "ws[\"B2\"] 取的是哪个单元格？", "opts": ["第 B 列第 2 行", "第二个工作表", "B 列的总和"], "ans": 0, "why": "列字母加行号就是单元格坐标，B2 是 B 列第 2 行。"}, {"q": "把公式字符串写进单元格，openpyxl 能算出结果吗？", "opts": ["能，和 Excel 一样", "不能，它只负责存公式，要等 Excel 打开才算；所以先用 Python 算好再写入数值"], "ans": 1, "why": "openpyxl 不做公式计算；读回带公式的单元格，未经 Excel 计算时读到的可能是 None。"}, {"q": "保存工作簿应该写？", "opts": ["wb.save(\"scores.xlsx\")", "wb.write(\"scores.xlsx\")", "print(wb)"], "ans": 0, "why": "工作簿对象用 save(文件名) 落盘。"}], "gi": 31, "diff": 3, "explain": "<p><b>是什么：</b>openpyxl 是读写 Excel 文件（.xlsx）的库：新建工作簿、往表里按行加数据、保存成文件、再读回来核对。成绩表、报表导出、批量填表，都是它的活。</p><p><b>代码怎么读：</b><code>Workbook()</code> 新建工作簿，<code>wb.active</code> 取当前表，改名「成绩表」；<code>ws.append([...])</code> 按行追加，先写表头，再写两行数据；<code>wb.save(\"scores.xlsx\")</code> 落盘；<code>load_workbook</code> 重新打开，<code>ws2[\"A1\"].value</code> 取单元格里的值。输出「姓名 数学」和「小林 180」——180 是 88 + 92 算出来的。</p><p><b>容易错：</b>单元格是列在前、行在后，<code>ws[\"B2\"]</code> 是 B 列第 2 行；把公式字符串写进单元格，openpyxl 只负责存，不会算出结果，数值要先用 Python 算好再写进去；写完不 <code>save()</code>，文件里什么都没有。</p>", "coding": {"task": "用 openpyxl 建一张成绩表：表头「姓名/数学/英语/总分」，三行数据——小林 88/92、小周 95/86、小陈 90/90，总分用 Python 算好再写入。保存为 scores.xlsx 后重新打开，打印两行：D 列的标题、小周的总分。判定会检查 scores.xlsx 是否真的生成。", "starter": "from openpyxl import Workbook, load_workbook\n# 建表、写数据和总分、保存，再读回打印\n", "expected": ["总分", "181"], "pkgs": ["pip:openpyxl"], "checkFile": "scores.xlsx"}}, {"stage": 3, "title": "pandas 进阶：透视表与合并", "mins": 30, "intro": "groupby 是把数据分组算；pivot_table（透视表）是把分组结果排成一张正规的汇总表，Excel 里的数据透视表就是它。merge 则按共同的列把两张表拼起来，比如给支出明细配上类别备注。", "code": "import pandas as pd\ndf = pd.DataFrame({\"类别\": [\"食\", \"食\", \"交通\", \"食\", \"交通\"], \"金额\": [20.0, 35.5, 12.0, 21.02, 9.9]})\npivot = df.pivot_table(index=\"类别\", values=\"金额\", aggfunc=\"sum\")\nfor name in sorted(pivot.index):\n    print(name, f\"{pivot.loc[name, '金额']:.2f}\")\nnotes = pd.DataFrame({\"类别\": [\"食\", \"交通\"], \"备注\": [\"一日三餐\", \"出行\"]})\nmerged = df.merge(notes, on=\"类别\")\nprint(merged.shape[0])", "out": ["交通 21.90", "食 76.52", "5"], "tip": "pivot_table 的 index 是按哪列分组，aggfunc 是怎么聚合（sum 求和、mean 平均、count 计数）。", "quiz": [{"q": "pivot_table(..., aggfunc=\"sum\") 里的 sum 表示？", "opts": ["按组计数", "按组求和", "按组求平均"], "ans": 1, "why": "aggfunc 决定每组怎么聚合，sum 就是把每组的金额加总。"}, {"q": "merge(notes, on=\"类别\") 是按什么拼两张表？", "opts": ["行号一一对应", "两张表共有的「类别」列，值相同就拼到一行", "随机配对"], "ans": 1, "why": "merge 按指定列的值匹配，把备注接到每条明细后面。"}, {"q": "透视表和 groupby 的关系，最准确的说法是？", "opts": ["完全无关", "透视表本质也是分组聚合，只是结果排成表格的样子，更像 Excel 的数据透视表", "透视表只能画图"], "ans": 1, "why": "两者内核都是分组聚合，透视表胜在结果规整、好读。"}], "gi": 32, "diff": 4, "explain": "<p><b>是什么：</b>透视表和合并是 pandas 里两张表打交道的招数：<code>pivot_table</code> 按某列分组、再按指定方式聚合，结果排成一张更像 Excel 数据透视表的样子；<code>merge</code> 按共有的列把两张表拼起来。</p><p><b>代码怎么读：</b><code>pivot_table(index=\"类别\", values=\"金额\", aggfunc=\"sum\")</code> 里，<code>index</code> 是按哪列分组，<code>values</code> 是对哪列做计算，<code>aggfunc=\"sum\"</code> 是求和——食组 20.0 + 35.5 + 21.02 = 76.52，交通组 12.0 + 9.9 = 21.90；<code>df.merge(notes, on=\"类别\")</code> 按「类别」把备注拼进来，拼完一共 5 行。</p><p><b>容易错：</b>透视表本质也是分组聚合，只是结果排成表格的样子，别把它当成新概念；<code>merge</code> 的 <code>on</code> 指定的列，两张表里都要有、值也要能对上，对不上的行拼法会不一样；聚合方式 <code>aggfunc</code> 换成 <code>mean</code> 或 <code>count</code>，答案的含义就跟着变。</p>", "coding": {"task": "用 pivot_table 按「类别」汇总金额，打印金额最大的类别和它的总和（总和保留两位小数，中间一个空格）。", "starter": "import pandas as pd\ndf = pd.DataFrame({\"类别\": [\"食\", \"交通\", \"食\", \"学习\"], \"金额\": [20.0, 12.0, 30.0, 45.0]})\n# 透视汇总，找最大的一组打印\n", "expected": ["食 50.00"], "pkgs": ["pandas"]}}, {"stage": 3, "title": "数据清洗：去重、缺失与格式统一", "mins": 25, "intro": "真实数据总是脏的：重复提交、漏填、名字前后带空格。清洗三件套：drop_duplicates 去重、dropna 处理缺失、str.strip() 去掉首尾空格。顺序也有讲究：先统一格式，再去重，最后处理缺失。", "code": "import pandas as pd\nrows = [\n    {\"姓名\": \" 小林 \", \"金额\": 20.0},\n    {\"姓名\": \"小林\", \"金额\": 20.0},\n    {\"姓名\": \"小周\", \"金额\": None},\n    {\"姓名\": \"小陈\", \"金额\": 35.5},\n]\ndf = pd.DataFrame(rows)\nprint(len(df))\ndf[\"姓名\"] = df[\"姓名\"].str.strip()\ndf = df.drop_duplicates().dropna()\nprint(len(df))\nprint(f\"{df['金额'].sum():.2f}\")", "out": ["4", "2", "55.50"], "tip": "先 strip 再去重：「 小林」和「小林」统一了才认得出是重复行。", "quiz": [{"q": "drop_duplicates() 删掉的是？", "opts": ["空行", "内容完全重复的行", "第一行"], "ans": 1, "why": "它保留第一次出现的行，删掉后面完全一样的重复行。"}, {"q": "dropna() 默认会删掉？", "opts": ["含有缺失值的行", "所有行", "重复的行"], "ans": 0, "why": "只要一行里有缺失（NaN/None），默认整行删掉；也可以选择只看某几列。"}, {"q": "为什么去重之前要先 strip 空格？", "opts": ["为了好看", "「 小林」和「小林」会被当成两个人，不统一就去不掉重、分组也会错", "strip 会顺便去重"], "ans": 1, "why": "字符串首尾的空格看不见却真实存在，格式不统一是数据对不上的头号原因。"}], "gi": 33, "diff": 4, "explain": "<p><b>是什么：</b>真实数据常常是脏的：名字前后多了空格、同一行重复录入、有的格子是空的。数据清洗就是在分析之前先把数据收拾干净，顺序是：统一格式、去重、处理缺失——顺序错了，脏东西就清不掉。</p><p><b>代码怎么读：</b>一开始 4 行：先 <code>df[\"姓名\"].str.strip()</code> 去掉名字两头的空格，「 小林 」变成「小林」；<code>drop_duplicates()</code> 删掉内容完全重复的行；<code>dropna()</code> 删掉含缺失值的行（小周那行金额是空的）；剩下 2 行，金额总和是 20.0 + 35.5 = 55.50。</p><p><b>容易错：</b>去重之前一定要先 <code>strip</code>——「 小林」和「小林」不统一，会被当成两个人，去重去不掉，分组也会错；<code>dropna()</code> 默认删掉任何含缺失值的行，删之前先确认这些行是不是真的不要了；洗完要核对行数和总和，确认洗掉的正是想洗掉的。</p>", "coding": {"task": "清洗下面这份数据：先给「姓名」去掉首尾空格，再去重、删掉金额缺失的行。打印两行：清洗后的行数、金额总和（保留两位小数）。", "starter": "import pandas as pd\nrows = [\n    {\"姓名\": \" 阿May \", \"金额\": 10.0},\n    {\"姓名\": \"阿May\", \"金额\": 10.0},\n    {\"姓名\": \"小李\", \"金额\": None},\n    {\"姓名\": \"小张\", \"金额\": 25.5},\n    {\"姓名\": \"小王\", \"金额\": 14.5},\n]\ndf = pd.DataFrame(rows)\n# strip、去重、删缺失，再打印\n", "expected": ["3", "50.00"], "pkgs": ["pandas"]}}, {"stage": 3, "title": "matplotlib 进阶：子图与标注", "mins": 25, "intro": "一张图说不清就画一组：plt.subplots(1, 2) 一次得到一行两列两个子图，左边看构成（柱状图），右边看趋势（折线图）。annotate 能在图上给关键点加上文字标注，报告立刻好读很多。", "code": "import matplotlib.pyplot as plt\nfig, axes = plt.subplots(1, 2, figsize=(8, 3))\naxes[0].bar([\"食\", \"交通\"], [76.52, 21.9])\naxes[0].set_title(\"类别支出\")\naxes[1].plot([1, 2, 3], [365.5, 445.9, 417.0], marker=\"o\")\naxes[1].set_title(\"月度趋势\")\nplt.tight_layout()\nplt.savefig(\"chart.png\")\nprint(\"图表已保存\")", "out": ["图表已保存"], "tip": "axes[0]、axes[1] 分别是两个子图，各画各的；tight_layout 让它们不挤在一起。", "quiz": [{"q": "plt.subplots(1, 2) 会得到什么？", "opts": ["两张独立的图片文件", "一行两列、共两个子图的一张图", "一个子图"], "ans": 1, "why": "subplots(行, 列) 一次建好整张图和每个子图的坐标系，axes 里按位置取用。"}, {"q": "想在图上标出最高的那笔支出，常用哪招？", "opts": ["annotate 给关键点加文字标注", "把图存大一点", "换个颜色"], "ans": 0, "why": "annotate 能把文字和箭头钉在指定的数据点上，读者一眼看到重点。"}, {"q": "plt.tight_layout() 的作用是？", "opts": ["自动调整间距，让子图和标题不重叠", "压缩图片文件", "让程序跑得更快"], "ans": 0, "why": "它自动排版，避免标题、标签互相遮挡。"}], "gi": 34, "diff": 4, "explain": "<p><b>是什么：</b>一张图里放两个子图，对比着看最清楚：左边柱状图看类别支出，右边折线图看月度趋势。<code>plt.subplots(1, 2)</code> 一次建好一整张图加两个子图，<code>axes[0]</code>、<code>axes[1]</code> 分别是左右两个。</p><p><b>代码怎么读：</b><code>fig, axes = plt.subplots(1, 2, figsize=(8, 3))</code> 建一行两列的子图；<code>axes[0].bar(...)</code> 在左边画柱状图并加标题「类别支出」；<code>axes[1].plot(..., marker=\"o\")</code> 在右边画折线图，<code>marker=\"o\"</code> 让每个数据点标个圆点；<code>plt.tight_layout()</code> 自动调间距防重叠，最后 <code>savefig</code> 存图。</p><p><b>容易错：</b><code>subplots(1, 2)</code> 的两个数字是行数和列数，别写反；两个子图各画各的，方法要挂在对应的 <code>axes</code> 上，挂错了图就跑到另一边去；想在图上标出最高点，用 <code>annotate</code> 加文字标注。</p>", "coding": {"task": "用 plt.subplots(1, 2) 画两个子图：左边柱状图（食 50、交通 12），右边折线图（三个月 365.5、445.9、417.0），存成 chart.png，最后打印「图表已保存」。判定会检查图文件是否真的生成。", "starter": "import matplotlib.pyplot as plt\n# 建子图、分别画柱状和折线、保存\n", "expected": ["图表已保存"], "pkgs": ["matplotlib"], "checkFile": "chart.png"}}, {"stage": 3, "title": "综合项目：个人账本年度报告", "mins": 40, "intro": "把这一阶段学的东西串起来：读入一整年的账本 ledger.csv（月份、类别、金额），按月汇总、找最高月份和最高类别，最后拼出一份像样的报告。真实账本就是把行数换成几百行，代码一行都不用改。", "code": "import pandas as pd\ndf = pd.read_csv(\"ledger.csv\")\nmonthly = df.groupby(\"月份\")[\"金额\"].sum()\nfor m in sorted(monthly.index):\n    print(m, f\"{monthly[m]:.2f}\")\nprint(\"总支出：\", f\"{df['金额'].sum():.2f}\")", "out": ["2026-09 365.50", "2026-10 445.90", "2026-11 417.00", "总支出： 1228.40"], "tip": "groupby(\"月份\") 按月分组求和；金额统一用 :.2f 输出，两位小数对得整齐。", "quiz": [{"q": "df.groupby(\"月份\")[\"金额\"].sum() 得到的是？", "opts": ["每个月的总支出", "每一笔支出", "每个类别的总数"], "ans": 0, "why": "按月份分组、对金额求和，结果就是月度汇总。"}, {"q": "想找支出最高的月份，monthly.idxmax() 返回？", "opts": ["最高的金额", "金额最高的那一个月的月份名", "月份的个数"], "ans": 1, "why": "idxmax 返回最大值所在的标签，这里就是月份字符串。"}, {"q": "金额打印时用 f\"{x:.2f}\" 是为了？", "opts": ["算得更快", "固定两位小数，金额列对得整齐好看", "把数字变成整数"], "ans": 1, "why": "格式化保留两位小数，365.5 就会显示成 365.50，符合金额习惯。"}], "gi": 35, "diff": 5, "explain": "<p><b>是什么：</b>年度报告是把阶段三、四的本事串起来的综合项目：读一整年的账本 <code>ledger.csv</code>，按月汇总、找最高月份和最高类别，最后拼出一份像样的报告。真实数据无非是行数换成几百行，代码一行都不用改。</p><p><b>代码怎么读：</b><code>df.groupby(\"月份\")[\"金额\"].sum()</code> 得到每个月的总支出；<code>for m in sorted(monthly.index)</code> 让月份按顺序逐行打印，金额用 <code>f\"{monthly[m]:.2f}\"</code> 固定两位小数；最后 <code>df[\"金额\"].sum()</code> 得总支出 1228.40——2026-09 是 365.50，2026-10 是 445.90，2026-11 是 417.00，三者相加正好是 1228.40。</p><p><b>容易错：</b>想找支出最高的月份，用 <code>monthly.idxmax()</code>，它返回的是月份名，不是金额；金额打印统一用 <code>:.2f</code>，小数位数对不齐的报告看着就不专业；分组列「月份」写错一个字，分出来的组就全错了。</p>", "coding": {"task": "ledger.csv 已经准备好（月份、类别、金额）。打印三行报告：总支出、支出最高的月份、支出最高的类别，格式照 starter 的注释。", "starter": "import pandas as pd\ndf = pd.read_csv(\"ledger.csv\")\n# 打印三行：总支出： X / 最高月份： X / 最高类别： X\n", "expected": ["总支出： 1228.40", "最高月份： 2026-10", "最高类别： 食"], "pkgs": ["pandas"], "files": ["ledger.csv"]}}, {"stage": 4, "title": "网络入门：HTTP、请求与响应", "mins": 25, "intro": "你每打开一个网页、刷一次手机，背后都是一次「请求—响应」：程序把请求发给服务器，服务器回一份响应——先是一个状态码，再是内容。专门给程序用的接口叫 API，它回的内容通常是 JSON，一种长得像 Python 字典的文本格式。", "code": "import json\nresp = '{\"状态\": \"成功\", \"状态码\": 200, \"数据\": {\"城市\": \"广州\", \"温度\": 26}}'\ndata = json.loads(resp)\nprint(data[\"状态码\"])\nprint(data[\"数据\"][\"城市\"], data[\"数据\"][\"温度\"])", "out": ["200", "广州 26"], "tip": "状态码先看开头：2 开头是成功，4 开头是你这边的问题（404 是找不到），5 开头是服务器的问题。", "quiz": [{"q": "服务器回状态码 404，通常表示？", "opts": ["服务器烧坏了", "要找的东西不存在、地址不对", "请求大成功"], "ans": 1, "why": "404 Not Found：地址对应的东西不存在，先检查网址有没有写错。"}, {"q": "API 返回的 JSON 文本，用 json.loads 处理后变成？", "opts": ["字典和列表的组合", "一张图片", "一个视频文件"], "ans": 0, "why": "JSON 的对象对应字典、数组对应列表，解析完就能像平常一样取值。"}, {"q": "在「请求—响应」里，客户端（你的程序）先做哪一步？", "opts": ["等响应", "发出请求", "关闭网络"], "ans": 1, "why": "永远是客户端先发请求，服务器才回响应。"}], "gi": 36, "diff": 3, "explain": "<p><b>是什么：</b>网络入门要先搞清「请求—响应」：你的程序是客户端，先发出请求；服务器收到后回一个响应，里面有状态码和数据。状态码先看开头：2 开头是成功，4 开头是你这边的问题，5 开头是服务器的问题。</p><p><b>代码怎么读：</b>课上用一段 JSON 文本模拟服务器的响应：<code>json.loads(resp)</code> 把文本解析成字典；<code>data[\"状态码\"]</code> 是 200，表示成功；<code>data[\"数据\"]</code> 又是一个字典，<code>[\"城市\"]</code> 是「广州」，<code>[\"温度\"]</code> 是 26，所以输出「200」和「广州 26」。字典里套字典，取值时一层一层往里找。</p><p><b>容易错：</b>404 最常见的意思是要找的东西不存在、地址写错了，先检查 URL 有没有打错；<code>json.loads</code> 处理的是 JSON 文本，得到的是字典和列表的组合，不是字符串了；拿到响应先看状态码，确认是 200 再往下解析。</p>", "coding": {"task": "下面是一份模拟 API 返回的账单 JSON。解析它，打印两行：账单笔数、总金额（保留两位小数）。", "starter": "import json\napi_text = '{\"笔数\": 3, \"账单\": [{\"项目\": \"午餐\", \"金额\": 19.82}, {\"项目\": \"晚餐\", \"金额\": 14.24}, {\"项目\": \"牛肉饭\", \"金额\": 21.02}]}'\n# 解析后打印笔数和总金额\n", "expected": ["3", "55.08"]}}, {"stage": 4, "title": "requests 实战：拿一份 JSON 数据", "mins": 25, "intro": "真实场景里拿数据就两步：requests.get(url) 拿到响应，.json() 把内容解析成字典。练习环境连不了外网，所以这里把一份和真实 API 一模一样的返回文本放在手边，先把「拿到之后怎么用」练熟——换成真网址时，处理代码一行不用改。", "code": "import json\napi_text = '{\"城市\": \"广州\", \"今日\": [{\"时段\": \"上午\", \"温度\": 26}, {\"时段\": \"下午\", \"温度\": 29}]}'\ndata = json.loads(api_text)\nprint(data[\"城市\"])\nfor part in data[\"今日\"]:\n    print(part[\"时段\"], part[\"温度\"])", "out": ["广州", "上午 26", "下午 29"], "tip": "真实写法：resp = requests.get(url)，data = resp.json()；动手前先确认 resp.status_code 是 200。", "quiz": [{"q": "requests.get(url) 直接拿到的就是字典吗？", "opts": ["是", "不是，它是响应对象，要再用 .json() 解析内容（或 .text 看原文）", "是图片"], "ans": 1, "why": "响应对象里装着状态码、响应头和内容，内容要自己取出来解析。"}, {"q": "拿到响应后，最稳妥的第一步是？", "opts": ["直接当数据用", "先看状态码是不是 200", "立刻关掉程序"], "ans": 1, "why": "状态码不对时内容多半是报错页，先确认 200 再处理，能少踩很多坑。"}, {"q": ".text 和 .json() 的区别是？", "opts": [".text 是原文字符串，.json() 把 JSON 解析成字典/列表", "完全一样", ".json() 是把文件下载下来"], "ans": 0, "why": "原文是字符串；解析成字典/列表之后才能按 key 取值、循环处理。"}], "gi": 37, "diff": 3, "explain": "<p><b>是什么：</b>requests 是 Python 里发网络请求的库：<code>requests.get(url)</code> 向一个网址发出请求，拿到响应对象；再用 <code>.json()</code> 把内容解析成字典。查天气、拉公告、取公开数据，都是这条路。</p><p><b>代码怎么读：</b>真实写法是 <code>resp = requests.get(url)</code>，然后 <code>data = resp.json()</code>；课上为了不用真的联网，用 <code>json.loads(api_text)</code> 模拟了同一份数据：<code>data[\"城市\"]</code> 是「广州」，<code>data[\"今日\"]</code> 是个列表，循环逐个打印「上午 26」「下午 29」。</p><p><b>容易错：</b><code>requests.get(url)</code> 直接拿到的不是字典，是响应对象，不解析就取键会报错；拿到响应后最稳妥的第一步是先看 <code>status_code</code> 是不是 200；<code>.text</code> 是原文字符串，<code>.json()</code> 才是解析好的字典，别混用。</p>", "coding": {"task": "解析这份天气 JSON，打印两行：第一行是城市和温度（中间一个空格），第二行是天气状况。", "starter": "import json\napi_text = '{\"城市\": \"广州\", \"温度\": 26, \"天气\": \"多云\"}'\n# 解析并按要求打印\n", "expected": ["广州 26", "多云"]}}, {"stage": 4, "title": "HTML 与 BeautifulSoup：把网页拆开看", "mins": 30, "intro": "网页本质上是一份 HTML 文本：一层层标签——h1 是大标题、a 是链接、li 是列表项。BeautifulSoup 把这份文本解析成一棵可以查询的树，想找什么标签就找什么。练习用一份内置的样本网页，结构和真实页面一模一样。", "code": "from bs4 import BeautifulSoup\nhtml = \"<html><body><h1>公告栏</h1><ul><li class='notice'>停课通知</li><li class='notice'>奖学金名单</li></ul><a href='/more'>更多</a></body></html>\"\nsoup = BeautifulSoup(html, \"html.parser\")\nprint(soup.h1.text)\nprint(len(soup.find_all(\"li\")))\nprint(soup.a[\"href\"])", "out": ["公告栏", "2", "/more"], "tip": "标签 .text 取里面的文字，标签[\"href\"] 取属性；find 只找第一个，find_all 找全部。", "quiz": [{"q": "find(\"li\") 和 find_all(\"li\") 的区别是？", "opts": ["没有区别", "find 只回第一个，find_all 回全部组成的列表", "find_all 不能用"], "ans": 1, "why": "单个定位用 find，批量提取用 find_all，拿回来再循环处理。"}, {"q": "想拿到一个链接的地址，应该取？", "opts": ["a 标签的文字", "a 标签的 href 属性", "整个网页"], "ans": 1, "why": "链接的文字是给人看的，地址藏在 href 属性里。"}, {"q": "在 BeautifulSoup 解析之前，网页本质上是？", "opts": ["一张图片", "一份带标签的纯文本", "一个数据库"], "ans": 1, "why": "浏览器拿到的是 HTML 文本，解析器把它变成可查询的结构，浏览器把它渲染成页面。"}], "gi": 38, "diff": 4, "explain": "<p><b>是什么：</b>网页本质上是一份带标签的纯文本，BeautifulSoup 就是把它拆开来看的工具：解析之后，你可以按标签名、按 class 找到想要的那一块，再把里面的文字或链接地址取出来。</p><p><b>代码怎么读：</b><code>BeautifulSoup(html, \"html.parser\")</code> 先解析；<code>soup.h1.text</code> 取 <code>&lt;h1&gt;</code> 里的文字「公告栏」；<code>soup.find_all(\"li\")</code> 找出全部两个 <code>&lt;li&gt;</code>，<code>len(...)</code> 是 2；<code>soup.a[\"href\"]</code> 取链接标签的 <code>href</code> 属性，得到「/more」。</p><p><b>容易错：</b><code>find</code> 只回第一个，<code>find_all</code> 回全部组成的列表，要一批数据时别用错；取文字用 <code>.text</code>，取地址这类属性要用 <code>[\"href\"]</code> 这种方括号写法；解析之前，网页只是一串文本，解析之后才有了能按标签找的结构。</p>", "coding": {"task": "用 BeautifulSoup 解析这份样本页，打印两行：h2 的文字、li 的个数。", "starter": "from bs4 import BeautifulSoup\nhtml = \"<html><body><h2>课程公告</h2><ul><li>周三加课</li><li>作业延期</li><li>考试安排</li></ul></body></html>\"\n# 解析后打印\n", "expected": ["课程公告", "3"], "pkgs": ["pip:beautifulsoup4"]}}, {"stage": 4, "title": "选择器实战：批量提取想要的数据", "mins": 30, "intro": "真实页面里要的东西往往是一批：所有商品名、所有价格。select 用的是和网页设计同款的 CSS 选择器：.price 表示 class 为 price 的元素，一次全拿下来；再把价格文字转成小数，就能求和、比较、排序。", "code": "from bs4 import BeautifulSoup\nhtml = \"\"\"<div class=\"item\"><h3>牛肉饭</h3><span class=\"price\">21.02</span></div>\n<div class=\"item\"><h3>牛肉拉面</h3><span class=\"price\">18.50</span></div>\"\"\"\nsoup = BeautifulSoup(html, \"html.parser\")\ntotal = 0.0\nfor item in soup.select(\".item\"):\n    name = item.h3.text\n    price = float(item.select_one(\".price\").text)\n    total += price\n    print(name, price)\nprint(\"总价：\", f\"{total:.2f}\")", "out": ["牛肉饭 21.02", "牛肉拉面 18.5", "总价： 39.52"], "tip": "select 返回全部匹配，select_one 只回第一个；.item 里的每个小块再往里找，就是批量提取的标准套路。", "quiz": [{"q": "select(\".price\") 里开头的 . 表示？", "opts": ["小数点", "按 class 查找", "一句话结束"], "ans": 1, "why": "CSS 选择器里 . 是 class 的记号，.price 就是找 class=\"price\" 的元素。"}, {"q": "把价格文字 \"21.02\" 变成能计算的数，应该用？", "opts": ["float()", "int() 就够了", "不用转，直接加"], "ans": 0, "why": "价格带小数，要用 float；字符串直接相加只会拼成一串字。"}, {"q": "select 拿回一批元素后，逐个处理靠什么结构？", "opts": ["if 判断", "for 循环遍历", "import"], "ans": 1, "why": "select/find_all 回的是列表，for 循环逐个取文字、转数字、累加，是标准流程。"}], "gi": 39, "diff": 4, "explain": "<p><b>是什么：</b>选择器实战是把「批量提取」做成标准套路：先用 <code>select(\".item\")</code> 一次拿回所有商品小块，再对每一块往里找名字和价格，逐个处理，最后汇总。爬一页商品、拉一列公告，都是这个套路。</p><p><b>代码怎么读：</b><code>soup.select(\".item\")</code> 里开头的点表示按 class 找，拿回两个小块；循环里 <code>item.h3.text</code> 取名字，<code>item.select_one(\".price\").text</code> 取价格文字，再用 <code>float(...)</code> 转成数字才能相加；21.02 + 18.50 = 39.52，最后用 <code>f\"{total:.2f}\"</code> 打印「总价： 39.52」。</p><p><b>容易错：</b><code>select</code> 返回全部匹配，<code>select_one</code> 只回第一个，取单个价格时别用错；价格文字是字符串，不转 <code>float</code> 就加不起来；<code>select</code> 拿回一批元素后，逐个处理靠的是 <code>for</code> 循环遍历。</p>", "coding": {"task": "用 select(\".item\") 批量提取每件商品的名字和价格，逐行打印（名字 空格 价格），最后一行打印总价（保留两位小数，格式：总价： X）。", "starter": "from bs4 import BeautifulSoup\nhtml = \"\"\"<div class=\"item\"><h3>牛肉饭</h3><span class=\"price\">21.02</span></div>\n<div class=\"item\"><h3>牛肉拉面</h3><span class=\"price\">18.50</span></div>\n<div class=\"item\"><h3>小杯面</h3><span class=\"price\">9.90</span></div>\"\"\"\n# 批量提取并打印\n", "expected": ["牛肉饭 21.02", "牛肉拉面 18.5", "小杯面 9.9", "总价： 49.42"], "pkgs": ["pip:beautifulsoup4"]}}, {"stage": 4, "title": "综合项目：一只礼貌的公告爬虫", "mins": 40, "intro": "把这一阶段串起来：解析一份公告页，提取每条的日期和标题，整理成 DataFrame，最后存成 CSV——这就是爬虫的完整骨架。最后记住爬虫礼仪：先看 robots 和网站条款、把频率放低、不碰隐私数据。能不能抓和应不应该抓，是两回事。", "code": "from bs4 import BeautifulSoup\nimport pandas as pd\nhtml = \"\"\"<ul>\n<li><span class=\"date\">2026-11-19</span><span class=\"title\">辩论赛观赛通知</span></li>\n<li><span class=\"date\">2026-11-26</span><span class=\"title\">心理健康见面课</span></li>\n<li><span class=\"date\">2026-12-01</span><span class=\"title\">奖学金申请截止</span></li>\n</ul>\"\"\"\nsoup = BeautifulSoup(html, \"html.parser\")\nrows = []\nfor li in soup.find_all(\"li\"):\n    rows.append({\"日期\": li.select_one(\".date\").text, \"标题\": li.select_one(\".title\").text})\ndf = pd.DataFrame(rows)\nprint(len(df))\nprint(df.iloc[0][\"标题\"])\ndf.to_csv(\"notices.csv\", index=False)\nprint(\"已保存\")", "out": ["3", "辩论赛观赛通知", "已保存"], "tip": "先在小样本上跑通整条链路，再换成真实页面；抓之前看一眼 robots.txt，频率放低，别给人家服务器添堵。", "quiz": [{"q": "爬虫礼仪里最基本的一条是？", "opts": ["速度越快越好", "控制频率，遵守 robots 和网站条款", "抓到多少算多少"], "ans": 1, "why": "人家的服务器是人家的资源；高频抓取轻则被封 IP，重则影响网站运行。"}, {"q": "df.to_csv(\"notices.csv\", index=False) 里 index=False 是？", "opts": ["不把行号单独存成一列", "不保存表头", "给文件加密"], "ans": 0, "why": "DataFrame 自带的行号索引一般不是数据的一部分，存表时关掉更干净。"}, {"q": "数据抓回来之后，通常紧接着做什么？", "opts": ["立刻删掉", "清洗、整理成表格，再做统计或报告", "打印一次就完事"], "ans": 1, "why": "原始数据总是要清洗成结构化的表格，才谈得上分析和应用。"}], "gi": 40, "diff": 5, "explain": "<p><b>是什么：</b>综合项目把整条链路串起来：一只「礼貌的」公告爬虫——请求页面、解析、批量提取、整理成表格、存成 CSV。礼貌的意思是：控制频率、遵守网站的 robots.txt 和条款，别给人家服务器添堵。</p><p><b>代码怎么读：</b>先在小样本上跑通整条链路：<code>find_all(\"li\")</code> 拿回三条公告，循环里用 <code>select_one(\".date\")</code> 和 <code>select_one(\".title\")</code> 各取日期和标题，拼成字典放进 <code>rows</code>；<code>pd.DataFrame(rows)</code> 建表，<code>len(df)</code> 是 3，<code>df.iloc[0][\"标题\"]</code> 是第一条「辩论赛观赛通知」；<code>df.to_csv(\"notices.csv\", index=False)</code> 存盘，<code>index=False</code> 是不把行号单独存成一列。</p><p><b>容易错：</b>直接上真实页面之前，先在小样本上跑通，链路通了再换真实数据；抓之前看一眼 robots.txt，频率放低；数据抓回来之后别急着交差，通常还要清洗、整理成表格，再做统计或报告。</p>", "coding": {"task": "把这页公告提取成 DataFrame（日期、标题两列），存成 notices.csv，打印两行：公告条数、最后一条的标题。判定会检查 notices.csv 是否真的生成。", "starter": "from bs4 import BeautifulSoup\nimport pandas as pd\nhtml = \"\"\"<ul>\n<li><span class=\"date\">2026-11-19</span><span class=\"title\">辩论赛观赛通知</span></li>\n<li><span class=\"date\">2026-11-26</span><span class=\"title\">心理健康见面课</span></li>\n<li><span class=\"date\">2026-12-01</span><span class=\"title\">奖学金申请截止</span></li>\n<li><span class=\"date\">2026-12-05</span><span class=\"title\">期末安排公布</span></li>\n</ul>\"\"\"\n# 提取、建表、存 CSV、打印\n", "expected": ["4", "期末安排公布"], "pkgs": ["pip:beautifulsoup4", "pandas"], "checkFile": "notices.csv"}}];
+const MEALS_CSV = "日期,项目,金额\n2026-11-17,午餐,19.82\n2026-11-17,晚餐,14.24\n2026-11-18,牛肉饭,21.02\n";
+const LEDGER_CSV = "月份,类别,金额\n2026-09,食,320.5\n2026-09,交通,45.0\n2026-10,食,356.0\n2026-10,学习,89.9\n2026-11,食,298.4\n2026-11,交通,52.6\n2026-11,娱乐,66.0\n";
+</script>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store=JSON.parse(localStorage.getItem('hobart-py-v1')||'{"done":[],"best":{}}');
+const save=()=>localStorage.setItem('hobart-py-v1',JSON.stringify(store));
+const pref=Object.assign({preheat:true, major:'acct'}, JSON.parse(localStorage.getItem('hobart-py-pref')||'{}'));
+const savePref=()=>localStorage.setItem('hobart-py-pref',JSON.stringify(pref));
+const MAJOR_PAIRS=[['个人账本年度报告','个人数据年度报告'],['账本年度报告','数据年度报告'],['账本报告','数据报告'],['会计应用','数据应用'],['把账本数据玩起来','把真实数据玩起来'],['账本','记录']];
+function swapMajor(t){ if(pref.major!=='general'||!t) return t; let s=t; for(const pr of MAJOR_PAIRS) s=s.split(pr[0]).join(pr[1]); return s; }
+function stageName(st){ return swapMajor(st.name); }
+function stageSub(st){ return swapMajor(st.sub); }
+function dispTitle(l){ return swapMajor(l.title); }
+function dispIntro(l){ return swapMajor(l.intro); }
+function dispExplain(l){ return swapMajor(l.explain||l.intro); }
+const doneSet=new Set(store.done);
+const totalMin=LESSONS.reduce((a,l)=>a+l.mins,0);
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function hl(code){
+  let s=esc(code);
+  s=s.replace(/(#[^\n]*)|((?:f|b|r)?"(?:[^"\\]|\\.)*"|(?:f|b|r)?'(?:[^'\\]|\\.)*')|\b(import|from|as|def|return|if|elif|else|for|while|in|not|and|or|try|except|with|True|False|None)\b|\b(\d+(?:\.\d+)?)\b|\b(print|len|range|float|int|str|type|input|sum|round|open|list|dict|append|sort|split|strip|read|write|values|keys|groupby|read_csv|bar|savefig|weekday|date)\b/g,
+   (m,cm,str,kw,num,fn)=> cm?'<span class="tok-cm">'+cm+'</span>' : str?'<span class="tok-str">'+str+'</span>' : kw?'<span class="tok-kw">'+kw+'</span>' : num?'<span class="tok-num">'+num+'</span>' : '<span class="tok-fn">'+fn+'</span>');
+  return s;
+}
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ---------- route render ---------- */
+let gidx=0; LESSONS.forEach(l=>l.gi=gidx++);
+function firstOpen(){const i=LESSONS.findIndex(l=>!doneSet.has(l.gi));return i<0?LESSONS.length-1:i}
+function renderRoute(){
+  const wrap=$('#stages'); wrap.innerHTML='';
+  STAGES.forEach((st,si)=>{
+    const items=LESSONS.map((l,i)=>({l,i})).filter(x=>x.l.stage===si);
+    const dn=items.filter(x=>doneSet.has(x.l.gi)).length;
+    const sec=document.createElement('section'); sec.className='stage reveal';
+    sec.innerHTML=`<div class="stage-head"><div class="medal">${st.medal}</div><div><h3>阶段${st.medal} · ${stageName(st)}</h3><div class="ss">${stageSub(st)}</div></div><div class="stage-bar"><i style="width:${dn/items.length*100}%"></i></div><div class="stage-pct">${dn}/${items.length}</div></div>
+    <div class="lessons"><div class="fill"></div>${items.map(({l,i},k)=>{
+      const d=doneSet.has(l.gi), cur=l.gi===firstOpen();
+      return `<div class="lsn reveal ${d?'done':''} ${cur&&!d?'current':''}" style="transition-delay:${(k%6)*55}ms" data-title="${dispTitle(l)}">
+        <div class="node">${d?'✓':l.gi+1}</div>
+        <div class="card" data-open="${i}" tabindex="0" role="button" aria-label="打开第 ${l.gi+1} 课">
+          <div class="top"><h4>第 ${l.gi+1} 课 · ${dispTitle(l)}</h4><span class="tag ${d?'done':cur?'cur':''}">${d?'已完成':cur?'当前课程':'未开始'}</span><span class="meta">${l.mins} 分钟 · ${l.quiz.length} 题 + 动手写 · 难度 ${DIFF_LAB[l.diff]}${diffSeg(l.diff)}</span></div>
+          <p>${dispIntro(l)}</p></div></div>`}).join('')}
+      <div class="flag">阶段${st.medal}终点 · 还剩 ${items.length-dn} 课</div>
+    </div>`;
+    wrap.appendChild(sec);
+    const fill=sec.querySelector('.fill'), list=sec.querySelector('.lessons');
+    requestAnimationFrame(()=>{fill.style.height=(dn/items.length)*(list.offsetHeight-12)+'px'});
+  });
+  bindCards(); updateRing(); observeReveals();
+}
+function updateRing(){
+  const n=doneSet.size, c=91.1;
+  $('#ringFg').style.strokeDashoffset=(c-c*n/LESSONS.length).toFixed(1);
+  $('#ringTxt').textContent=`已完成 ${n} / ${LESSONS.length} 课`;
+  renderAchv();
+}
+function renderAchv(){
+  const xp=doneSet.size*50+(store.codeDone||[]).length*30+Object.values(store.best||{}).reduce((a,b)=>a+(+b||0),0)*10;
+  const xl=$('#xpLab'); if(xl) xl.textContent=xp+' XP';
+  const row=$('#achvRow'); if(!row) return;
+  const stTot={}, stDone={}; LESSONS.forEach(l=>{ stTot[l.stage]=(stTot[l.stage]||0)+1; if(doneSet.has(l.gi)) stDone[l.stage]=(stDone[l.stage]||0)+1; });
+  const B=[['初露锋芒','完成第 1 课',doneSet.size>=1]];
+  STAGES.forEach((st,si)=>{ B.push([stageName(st)+'全清','完成阶段'+st.medal+'的全部课程',!!(stTot[si]&&(stDone[si]||0)>=stTot[si])]); });
+  B.push(['代码工匠','动手题通过 10 课',(store.codeDone||[]).length>=10]);
+  B.push(['半程英雄','完成 21 课',doneSet.size>=21]);
+  B.push(['大满贯','全部课程完成',doneSet.size>=LESSONS.length]);
+  row.innerHTML=B.map(b=>`<span class="bdg ${b[2]?'on':''}" title="${b[1]}">${b[2]?'✓ ':''}${b[0]}</span>`).join('');
+}
+function bindCards(){
+  $$('.card').forEach(c=>{
+    c.addEventListener('click',()=>openLesson(+c.dataset.open));
+    c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openLesson(+c.dataset.open)}});
+    if(!reduced&&matchMedia('(hover:hover)').matches){
+      c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+        c.style.setProperty('--mx',x+'px');c.style.setProperty('--my',y+'px');
+        c.style.transform=`perspective(900px) rotateX(${((y/r.height)-.5)*-3.4}deg) rotateY(${((x/r.width)-.5)*3.4}deg) translateY(-2px)`});
+      c.addEventListener('mouseleave',()=>{c.style.transform=''});
+    }
+  });
+}
+/* ---------- reveal & countup ---------- */
+let io;
+function observeReveals(){ if(io)io.disconnect();
+  io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08});
+  $$('.reveal').forEach(el=>io.observe(el));
+}
+const cio=new IntersectionObserver(es=>es.forEach(e=>{ if(!e.isIntersecting)return; cio.unobserve(e.target);
+  const end=+e.target.dataset.count, t0=performance.now();
+  (function tick(t){const p=Math.min(1,(t-t0)/1100); e.target.textContent=Math.round(end*(0.22+0.78*p*p*(3-2*p)*0+ (1-Math.pow(1-p,3)) )).toString(); if(p<1)requestAnimationFrame(tick); else e.target.textContent=end;})(t0);
+}),{threshold:.4});
+(function(){ const stats=[LESSONS.length, LESSONS.reduce((s,l)=>s+l.quiz.length,0)+LESSONS.filter(l=>l.coding).length, LESSONS.reduce((s,l)=>s+l.mins,0), STAGES.length];
+  $$('[data-count]').forEach((el,i)=>{ if(stats[i]!=null) el.dataset.count=stats[i]; });
+  const caps=$$('.stat .t'); if(caps[3]) caps[3].textContent=STAGES.map(s=>stageName(s)).join(' · ');
+})();
+$$('[data-count]').forEach(el=>cio.observe(el));
+/* ---------- hero typing ---------- */
+const SNIPS=[
+ {f:'hello.py',code:'print("你好，Python")\nprint(19.82 + 14.24)',out:['你好，Python','34.06']},
+ {f:'variables.py',code:'lunch = 19.82\ndinner = 14.24\ntotal = lunch + dinner\nprint(total)',out:['34.06']},
+ {f:'loop.py',code:'total = 0\nfor i in range(1, 6):\n    total = total + i\nprint(total)',out:['15']}];
+let snipI=0;
+async function heroLoop(){
+  const codeEl=$('#heroCode'), outEl=$('#heroOut'), fileEl=$('#heroFile');
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  while(true){
+    const s=SNIPS[snipI%SNIPS.length]; snipI++;
+    fileEl.textContent=s.f; outEl.innerHTML=''; codeEl.innerHTML='';
+    if(reduced){ codeEl.innerHTML=hl(s.code); outEl.innerHTML=s.out.map(o=>esc(o)).join('<br>'); await wait(4000); continue; }
+    const plain=s.code; let buf='';
+    codeEl.innerHTML='<span class="caret"></span>';
+    for(const ch of plain){ buf+=ch; codeEl.innerHTML=esc(buf)+'<span class="caret"></span>'; let dly=38+Math.random()*46; if(ch==='\n') dly=300+Math.random()*160; else if(ch===':'||ch===','||ch==='(') dly+=64; await wait(dly); }
+    codeEl.innerHTML=hl(plain); await wait(560);
+    for(const line of s.out){ const dv=document.createElement('div'); dv.className='oline'; dv.textContent=line; outEl.appendChild(dv); await wait(360+Math.random()*240); }
+    await wait(3200);
+  }
+}
+/* ---------- lesson sheet ---------- */
+let cur=-1, quizSel=[], quizPos=0, quizLock=false;
+const DIFF_LAB={1:'入门',2:'基础',3:'进阶',4:'挑战',5:'综合'};
+function diffSeg(n){ let s='<span class="diff" aria-hidden="true">'; for(let k=1;k<=5;k++) s+='<i class="'+(k<=n?'on':'')+'"></i>'; return s+'</span>'; }
+function openLesson(i){
+  cur=i; quizSel=LESSONS[i].quiz.map(()=>null); quizPos=0; quizLock=false;
+  const l=LESSONS[i], st=STAGES[l.stage];
+  $('#sheet').innerHTML=`
+   <div class="sh-head"><div><div class="stg">阶段${st.medal} · ${stageName(st)} — LESSON ${l.gi+1} / ${LESSONS.length} · 难度 ${DIFF_LAB[l.diff]}${diffSeg(l.diff)}</div>
+   <h3>${dispTitle(l)}</h3></div><button class="x" id="shClose" aria-label="关闭">✕</button></div>
+   <div class="sec-t">讲解</div>
+   <div class="intro">${dispExplain(l)}</div>
+   <div class="tip"><b>注意 ·</b> ${l.tip}</div>
+   <div class="sec-t">代码演示</div>
+   <div class="codebox" id="demoBox"><div class="cb-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="fn">demo.py</span><button class="runbtn" id="runBtn">▶ 运行演示</button></div>
+   <pre id="demoCode">${hl(l.code)}</pre>
+   <div class="console" id="demoCon"><div class="hd">运行结果</div><div id="demoOut"></div></div></div>
+   <div class="sec-t">互动练习 · ${l.quiz.length} 题</div>
+   <div id="quizBox"></div>
+   <div class="sec-t">动手写 · 即刻判定<label class="pref-t" title="打开课程时在后台提前加载 Python 运行环境，写代码时不用等冷启动"><input type="checkbox" id="prefHeat">预热运行环境</label></div>
+   <div class="prebar" id="preBar" hidden><div class="pre-row"><span id="preLab">正在加载运行环境</span><b id="prePct">0%</b></div><div class="pre-track"><div class="pre-fill" id="preFill"></div></div></div>
+   <div id="codeBox"></div>
+   <div class="sec-t">AI 讲解 · 接入自己的 AI</div>
+   <div id="aiBox"></div>
+   <div class="sh-nav">
+     <button class="btn btn-ghost" id="prevBtn" ${i===0?'disabled style="opacity:.4"':''}>← 上一课</button>
+     <button class="btn btn-ghost" id="nextBtn" ${i===LESSONS.length-1?'disabled style="opacity:.4"':''}>下一课 →</button>
+     <span style="flex:1"></span>
+     <span class="score" id="doneState">${doneSet.has(l.gi)?'✓ 本课已完成':'完成练习后点亮本课'}</span>
+   </div>`;
+  $('#overlay').classList.add('open'); document.body.style.overflow='hidden';
+  const ph=$('#prefHeat'); if(ph){ ph.checked=!!pref.preheat; ph.onchange=()=>{ pref.preheat=ph.checked; savePref(); if(ph.checked){ try{ startPreheat(); }catch(e){} } else { const b=$('#preBar'); if(b) b.hidden=true; } }; }
+  if(pref.preheat){ try{ startPreheat(); }catch(e){} }
+  $('#sheet').scrollTop=0;
+  const sb=$('#shBody'); if(sb){ sb.classList.remove('shbody-in'); void sb.offsetWidth; sb.classList.add('shbody-in'); }
+  $('#shClose').onclick=closeLesson;
+  $('#prevBtn').onclick=()=>{if(cur>0)openLesson(cur-1)};
+  $('#nextBtn').onclick=()=>{if(cur<LESSONS.length-1)openLesson(cur+1)};
+  $('#runBtn').onclick=runDemo;
+  const db=$('#demoBox');
+  if(db && !reduced && 'IntersectionObserver' in window){ const dio=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.intersectionRatio>=0.5){ dio.disconnect(); const b=$('#runBtn'); if(b && !b.disabled && b.textContent.indexOf('再跑')<0) runDemo(); } }); },{threshold:[0.5]}); dio.observe(db); }
+  renderQuiz(); renderCoding(); renderAiBox();
+}
+function closeLesson(){ $('#overlay').classList.remove('open'); document.body.style.overflow=''; renderRoute(); }
+$('#overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeLesson(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('#overlay').classList.contains('open')) closeLesson(); });
+async function runDemo(){
+  const l=LESSONS[cur], btn=$('#runBtn'), pre=$('#demoCode'), con=$('#demoCon'), out=$('#demoOut');
+  btn.disabled=true; btn.textContent='运行中…'; con.classList.remove('show'); out.innerHTML='';
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  if(reduced){ pre.innerHTML=hl(l.code); }
+  else{ let buf=''; for(const ch of l.code){ buf+=ch; pre.textContent=buf; let dly=38+Math.random()*46; if(ch==='\n') dly=300+Math.random()*160; else if(ch===':'||ch===','||ch==='(') dly+=64; await wait(dly);} pre.innerHTML=hl(l.code); }
+  await wait(560); con.classList.add('show');
+  for(const line of l.out){ const dv=document.createElement('div'); dv.className='oline'; dv.textContent=line; out.appendChild(dv); await wait(360+Math.random()*240); }
+  btn.disabled=false; btn.textContent='↻ 再跑一次';
+}
+function renderQuiz(){
+  const l=LESSONS[cur], box=$('#quizBox');
+  const answered=quizSel.filter(x=>x!==null).length;
+  if(answered===l.quiz.length){ renderQuizResult(); return; }
+  const q=l.quiz[quizPos], sel=quizSel[quizPos];
+  box.innerHTML=`<div class="qdots">${l.quiz.map((_,k)=>`<i class="${quizSel[k]===null?(k===quizPos?'now':''):quizSel[k]===l.quiz[k].ans?'ok':'bad'}"></i>`).join('')}</div>
+   <div class="quiz-q">第 ${quizPos+1} 题 · ${q.q}</div>
+   <div class="opts">${q.opts.map((o,k)=>{let cls=''; if(sel!==null){ if(k===q.ans)cls='right'; else if(k===sel)cls='wrong'; }
+     return `<button class="opt ${cls}" data-k="${k}" ${sel!==null?'disabled':''}>${esc(o)}</button>`}).join('')}</div>
+   <div class="why ${sel!==null?'show':''}">${sel!==null?('<b>'+(sel===q.ans?'✓ 答对了。':'✗ 答错了。')+'</b> '+q.why):''}</div>
+   <div class="quiz-foot">${sel!==null?`<button class="btn btn-gold" id="qNext" style="padding:11px 26px;font-size:14px">${quizPos<l.quiz.length-1?'下一题 →':'查看结果'}</button>`:''}
+   <span class="score">已答 ${answered} / ${l.quiz.length}</span></div>`;
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ if(quizLock)return; quizLock=true; quizSel[quizPos]=+b.dataset.k; setTimeout(()=>{quizLock=false; renderQuiz();},60); });
+  const nx=$('#qNext'); if(nx) nx.onclick=()=>{ if(quizPos<l.quiz.length-1){quizPos++; renderQuiz();} else renderQuizResult(); };
+}
+function renderQuizResult(){
+  const l=LESSONS[cur], score=quizSel.reduce((a,s,k)=>a+(s===l.quiz[k].ans?1:0),0);
+  const prevBest=store.best[l.gi]||0; if(score>prevBest){store.best[l.gi]=score; save();}
+  $('#quizBox').innerHTML=`<div class="qdots">${l.quiz.map((q,k)=>`<i class="${quizSel[k]===q.ans?'ok':'bad'}"></i>`).join('')}</div>
+   <div class="quiz-q">${score===l.quiz.length?'全对，漂亮！':score===l.quiz.length-1?'就差一题，全对在望。':'这一课先记个大概，错题讲解都在上面。'}</div>
+   <div class="why show">本课得分 <b>${score} / ${l.quiz.length}</b>${prevBest?` · 历史最佳 ${Math.max(prevBest,score)} / ${l.quiz.length}`:''}。${score<l.quiz.length?'点「再练一次」可以重做错题思路，讲解会再看一遍。':'点下面按钮点亮这一课，金线会往前走。'}</div>
+   <div class="quiz-foot">
+     <button class="btn btn-ghost" id="qRetry" style="padding:11px 24px;font-size:14px">再练一次</button>
+     ${doneSet.has(l.gi)?'<span class="score">✓ 本课已完成</span>':`<button class="btn btn-gold" id="qDone" style="padding:11px 26px;font-size:14px">完成本课 ✓</button>`}
+   </div>`;
+  $('#qRetry').onclick=()=>{ quizSel=LESSONS[cur].quiz.map(()=>null); quizPos=0; renderQuiz(); };
+  const dn=$('#qDone'); if(dn) dn.onclick=completeLesson;
+}
+function completeLesson(){
+  const l=LESSONS[cur]; doneSet.add(l.gi); store.done=[...doneSet]; save();
+  $('#doneState').textContent='✓ 本课已完成'; confettiBurst();
+  renderQuizResult(); updateRing();
+  const nx=$('#nextBtn'); if(nx&&cur<LESSONS.length-1){ nx.textContent='下一课 → 已解锁'; }
+  if(doneSet.size===LESSONS.length){ setTimeout(()=>confettiBurst(true),450); }
+}
+/* ---------- confetti ---------- */
+const cv=$('#confetti'), cx=cv.getContext('2d'); let parts=[], rafId=null;
+function sizeCv(){cv.width=innerWidth; cv.height=innerHeight} sizeCv(); addEventListener('resize',sizeCv);
+function confettiBurst(big=false){
+  if(reduced) return;
+  const colors=['#f5c65c','#e3a82b','#f2efe7','#4cc2a6'];
+  const n=big?170:80;
+  for(let k=0;k<n;k++){ parts.push({x:innerWidth/2+(Math.random()-.5)*260, y:innerHeight*0.32, vx:(Math.random()-.5)*(big?13:9), vy:-Math.random()*9-4, g:.28, s:Math.random()*7+4, r:Math.random()*Math.PI, vr:(Math.random()-.5)*.3, c:colors[k%colors.length], life:1, decay:.006+Math.random()*.006}); }
+  if(!rafId) confettiTick();
+}
+function confettiTick(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+30);
+  for(const p of parts){ p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.r+=p.vr; p.life-=p.decay;
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.globalAlpha=Math.max(0,p.life); cx.fillStyle=p.c; cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.62); cx.restore(); }
+  if(parts.length){ rafId=requestAnimationFrame(confettiTick); } else { rafId=null; cx.clearRect(0,0,cv.width,cv.height); }
+}
+/* ---------- misc wiring ---------- */
+$('#ctaStart').onclick=()=>{ const i=firstOpen(); if(doneSet.size===LESSONS.length){ document.getElementById('route').scrollIntoView({behavior:'smooth'}); } else openLesson(i); };
+$('#ctaRoute').onclick=()=>document.getElementById('route').scrollIntoView({behavior:'smooth'});
+$('#searchBox').addEventListener('input',e=>{
+  const kw=e.target.value.trim(); let any=false;
+  $$('.stage').forEach(sec=>{ let vis=false;
+    sec.querySelectorAll('.lsn').forEach(n=>{ const hit=!kw||n.dataset.title.includes(kw); n.style.display=hit?'':'none'; if(hit){vis=true;any=true;} });
+    sec.style.display=vis?'':'none'; });
+  $('#emptyMsg').style.display=any?'none':'block';
+});
+/* ---------- AI tutor (bring your own key) ---------- */
+const AI_LS='hobart-py-ai';
+const PRESETS=[['OpenAI','https://api.openai.com/v1','gpt-4o-mini'],['DeepSeek','https://api.deepseek.com/v1','deepseek-chat'],['通义千问（兼容模式）','https://dashscope.aliyuncs.com/compatible-mode/v1','qwen-plus'],['硅基流动','https://api.siliconflow.com/v1','deepseek-ai/DeepSeek-V3'],['自定义','','']];
+let aiCfg=null; try{ aiCfg=JSON.parse(localStorage.getItem(AI_LS)||'null'); }catch(e){ aiCfg=null; }
+function aiReady(){ return !!(aiCfg&&aiCfg.key&&aiCfg.base&&aiCfg.model); }
+function openAiModal(){
+  const sel=$('#aiPreset'); sel.innerHTML=PRESETS.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('');
+  if(aiCfg){ $('#aiBase').value=aiCfg.base||''; $('#aiKey').value=aiCfg.key||''; $('#aiModel').value=aiCfg.model||'';
+    const pi=PRESETS.findIndex(p=>p[1]&&p[1]===aiCfg.base); sel.value=pi>=0?pi:PRESETS.length-1; }
+  else{ sel.value=0; $('#aiBase').value=PRESETS[0][1]; $('#aiModel').value=PRESETS[0][2]; $('#aiKey').value=''; }
+  $('#aiState').textContent=aiReady()?('已接入 · '+aiCfg.model):'尚未保存 Key';
+  $('#aiModal').classList.add('open');
+}
+function closeAiModal(){ $('#aiModal').classList.remove('open'); }
+$('#aiBtn').onclick=openAiModal;
+$('#aiClose').onclick=closeAiModal;
+$('#aiModal').addEventListener('click',e=>{ if(e.target.id==='aiModal') closeAiModal(); });
+$('#aiPreset').addEventListener('change',e=>{ const p=PRESETS[+e.target.value]; if(p[1]){ $('#aiBase').value=p[1]; } if(p[2]){ $('#aiModel').value=p[2]; } });
+$('#aiSave').onclick=()=>{
+  aiCfg={base:$('#aiBase').value.trim().replace(/\/+$/,''), key:$('#aiKey').value.trim(), model:$('#aiModel').value.trim()};
+  if(!aiReady()){ $('#aiState').textContent='三项都要填：接口地址、Key、模型'; return; }
+  localStorage.setItem(AI_LS,JSON.stringify(aiCfg));
+  $('#aiState').textContent='已保存 · '+aiCfg.model; renderAiBox();
+  setTimeout(closeAiModal,650);
+};
+$('#aiClear').onclick=()=>{ localStorage.removeItem(AI_LS); aiCfg=null; $('#aiKey').value=''; $('#aiState').textContent='已清除'; renderAiBox(); };
+const codeCache={}, lastJudge={};
+const CHATS_LS='hobart-py-ai-chats';
+let aiChats={}; try{ aiChats=JSON.parse(localStorage.getItem(CHATS_LS)||'{}'); }catch(e){ aiChats={}; }
+function saveChats(){ try{ localStorage.setItem(CHATS_LS, JSON.stringify(aiChats)); }catch(e){} }
+function chatOf(gi){ if(!aiChats[gi]) aiChats[gi]=[]; return aiChats[gi]; }
+function bubbleHtml(m){ return m.role==='user' ? `<div class="msg u">${esc(m.content)}</div>` : `<div class="msg a">${fmtAi(m.content)}</div>`; }
+function renderAiBox(){
+  const box=$('#aiBox'); if(!box) return;
+  if(!aiReady()){
+    box.innerHTML=`<div class="why show">这一课想问更深、或者想要个生活化的讲解？接入你自己的 AI 就能直接问它，还能连续追问。<br>本站不提供 AI 服务，也拿不到你的 Key——Key 只存在你自己的浏览器里，费用算你自己的账号。</div>
+    <div class="quiz-foot"><button class="btn btn-gold" id="aiOpen2" style="padding:11px 26px;font-size:14px">接入我的 AI</button></div>`;
+    $('#aiOpen2').onclick=openAiModal; return;
+  }
+  const l=LESSONS[cur], chat=chatOf(l.gi);
+  box.innerHTML=`
+  <div class="ai-thread" id="aiThread">${chat.length? chat.map(m=>bubbleHtml(m)).join('') : '<div class="msg a">我是这一课的 AI 讲解员。这一课里你选错的题、写过的代码和判定结果我都看得到，可以针对你错的地方讲；还能连续追问，回答时你也能随时插话打断我。</div>'}</div>
+  <div class="ai-qrow" style="margin-top:12px"><input id="aiQ" type="text" placeholder="接着问…（Enter 发送）"><button class="btn btn-gold" id="aiAsk" style="padding:11px 22px;font-size:14px">发送</button></div>
+  <div class="quiz-foot" style="margin-top:10px"><button class="btn btn-ghost" id="aiExplain" style="padding:9px 20px;font-size:13px">让 AI 讲解这一课</button><button class="btn btn-ghost" id="aiStop" style="padding:9px 20px;font-size:13px;display:none">停止生成</button><button class="btn btn-ghost" id="aiReset" style="padding:9px 20px;font-size:13px">清空对话</button><span class="score">当前模型 · ${esc(aiCfg.model)} · AI 看得到你的作答 · 回答中可插话</span></div>`;
+  const th=$('#aiThread'); th.scrollTop=th.scrollHeight;
+  const send=()=>{ const v=$('#aiQ').value.trim(); if(v){ $('#aiQ').value=''; askAI(v); } };
+  $('#aiAsk').onclick=send;
+  $('#aiQ').addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
+  $('#aiExplain').onclick=()=>askAI('请讲解这一课的核心概念，配一个生活化的例子，再提醒一个最容易踩的坑。');
+  $('#aiStop').onclick=()=>{ if(aiAbort) aiAbort.abort(); };
+  $('#aiReset').onclick=()=>{ if(aiAbort) aiAbort.abort(); aiChats[l.gi]=[]; saveChats(); renderAiBox(); };
+}
+function fmtAi(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`\n]+)`/g,'<code>$1</code>'); }
+let aiAbort=null, aiSeq=0;
+function attemptContext(l){
+  const parts=[];
+  (l.quiz||[]).forEach((q,qi)=>{ const a=store.answers[l.gi+'-'+qi];
+    if(a!==undefined&&a!==null) parts.push('选择题'+(qi+1)+'：'+q.q+'\n他的选择：'+q.opts[a]+'（'+(a===q.ans?'答对了':'答错了')+'）\n正确答案：'+q.opts[q.ans]+(q.why?'；解析：'+q.why:'')); });
+  if(l.coding){ const code=codeCache[l.gi], j=lastJudge[l.gi];
+    if(code) parts.push('动手题：'+l.coding.task+'\n他最近写的代码：\n'+code+(j?'\n最近一次判定：'+j:''));
+    else if(j) parts.push('动手题最近一次判定：'+j); }
+  return parts.length? '【他的作答情况——请结合这些来回答，重点讲他做错、卡住的地方；练习题仍只给提示和思路，不给完整答案】\n'+parts.join('\n\n') : '';
+}
+async function askAI(q){
+  const l=LESSONS[cur], chat=chatOf(l.gi), th=$('#aiThread'); if(!th) return;
+  if(aiAbort) aiAbort.abort();
+  const mySeq=++aiSeq;
+  chat.push({role:'user', content:q}); if(chat.length>40) chat.splice(0, chat.length-40); saveChats();
+  th.insertAdjacentHTML('beforeend', bubbleHtml({role:'user',content:q}));
+  const bub=document.createElement('div'); bub.className='msg a'; bub.textContent='思考中…'; th.appendChild(bub);
+  th.scrollTop=th.scrollHeight;
+  const stopBtn=$('#aiStop'); if(stopBtn) stopBtn.style.display='';
+  const sys='你是一位耐心的 Python 编程老师，正在辅导一位会计专业大一学生自学 Python。用简体中文、通俗易懂地讲解，多用生活例子（记账、金额、问卷）。如果学生问的是练习题，不要直接给答案，只给提示和思路，引导他自己想出来。结合之前的对话回答追问。回答控制在 300 字以内，分段清晰。';
+  const ctx='当前课程：第 '+(l.gi+1)+' 课《'+dispTitle(l)+'》\n讲解：'+dispExplain(l)+'\n注意点：'+l.tip+'\n示例代码：\n'+l.code+'\n运行结果：'+l.out.join(' / ');
+  const att=attemptContext(l);
+  const hist=chat.slice(-12);
+  const msgs=[{role:'system',content:sys}];
+  if(att) msgs.push({role:'system',content:att});
+  hist.forEach((m,i)=>{ msgs.push({role:m.role, content:(i===0&&m.role==='user')? ctx+'\n\n学生的问题：'+m.content : m.content}); });
+  const ctrl=new AbortController(); aiAbort=ctrl;
+  let acc='', settled=false;
+  try{
+    const r=await fetch(aiCfg.base+'/chat/completions',{method:'POST', signal:ctrl.signal,
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiCfg.key},
+      body:JSON.stringify({model:aiCfg.model,temperature:0.7,stream:true,messages:msgs})});
+    if(!r.ok){ const j=await r.json().catch(()=>null); throw new Error('请求失败：'+((j&&j.error&&j.error.message)||('HTTP '+r.status))+'。请检查接口地址、Key 和模型名。'); }
+    const ct=(r.headers.get('content-type')||'');
+    if(ct.includes('text/event-stream')&&r.body&&r.body.getReader){
+      const reader=r.body.getReader(), dec=new TextDecoder(); let buf='';
+      while(true){ const rd=await reader.read(); if(rd.done) break;
+        buf+=dec.decode(rd.value,{stream:true});
+        let idx; while((idx=buf.indexOf('\n'))>=0){ const line=buf.slice(0,idx).trim(); buf=buf.slice(idx+1);
+          if(line.startsWith('data:')){ const data=line.slice(5).trim();
+            if(data&&data!=='[DONE]'){ try{ const jj=JSON.parse(data); const delta=jj.choices&&jj.choices[0]&&jj.choices[0].delta&&jj.choices[0].delta.content;
+              if(delta){ acc+=delta; if(mySeq===aiSeq){ bub.innerHTML=fmtAi(acc); th.scrollTop=th.scrollHeight; } } }catch(e){} } } }
+      }
+    } else { const j=await r.json(); const t=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content; if(t) acc=t; }
+    settled=true;
+  }catch(err){
+    if(err&&err.name==='AbortError'){ if(acc){ acc+='\n\n（已被打断）'; settled=true; } else if(mySeq===aiSeq){ bub.textContent='（已停止生成）'; } }
+    else { if(mySeq===aiSeq){ bub.classList.add('err'); bub.textContent=(err&&err.message?err.message:'请求没有发出去：可能是网络问题，或者该接口不允许浏览器直接调用（跨域限制）。')+'这条不计入对话，可以直接重发。'; } chat.pop(); saveChats(); }
+  }
+  if(settled&&acc){ chat.push({role:'assistant', content:acc}); saveChats(); if(mySeq===aiSeq) bub.innerHTML=fmtAi(acc); }
+  if(mySeq===aiSeq){ aiAbort=null; if(stopBtn) stopBtn.style.display='none'; th.scrollTop=th.scrollHeight; }
+}
+/* ---------- hands-on judge: real Python in the browser (Pyodide) ---------- */
+store.codeDone=store.codeDone||[];
+let pyWorker=null, pySeq=0, pyWarm=false; const pyPending={};
+const WORKER_SRC=[
+"importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');",
+"let py=null, loaded={}, ready=(async()=>{ py=await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'}); })();",
+"ready.then(()=>{ try{ postMessage({type:'progress', stage:'base'}); }catch(e){} });",
+"onmessage=async e=>{ const d=e.data, id=d.id;",
+" try{ await ready; }catch(err){ postMessage({id, bootError:String(err)}); return; }",
+" try{",
+"  for(const p of (d.pkgs||[])){ if(loaded[p]) continue; if(p.indexOf('pip:')===0){ if(!loaded.__mp){ await py.loadPackage('micropip'); loaded.__mp=1; } await py.pyimport('micropip').install(p.slice(4)); } else { await py.loadPackage(p); } loaded[p]=1; }",
+"  try{ postMessage({type:'progress', stage:'pkgs'}); }catch(e){}",
+"  if(d.type==='preheat'){ postMessage({id, ok:true, preheated:true}); return; }",
+"  const files=d.files||{}; for(const k in files){ py.FS.writeFile(k, files[k]); }",
+"  let out=[]; py.setStdout({batched:s=>out.push(s)}); py.setStderr({batched:s=>out.push(s)});",
+"  let r={id, ok:true, out};",
+"  try{ await py.runPythonAsync(d.code); }catch(err){ r.ok=false; r.error=String(err&&err.message?err.message:err); }",
+"  if(d.checkFile){ try{ r.fileExists=!!py.FS.analyzePath(d.checkFile).exists; }catch(e2){ r.fileExists=false; } }",
+"  postMessage(r);",
+" }catch(err){ postMessage({id, fatal:String(err)}); }",
+"};"
+].join('\n');
+function ensurePyWorker(){ if(pyWorker) return pyWorker;
+  pyWorker=new Worker(URL.createObjectURL(new Blob([WORKER_SRC],{type:'text/javascript'})));
+  pyWorker.onmessage=e=>{ const d=e.data; if(d&&d.type==='progress'){ onPyProgress(d.stage); return; } const p=pyPending[d.id]; if(p){ delete pyPending[d.id]; p(d); } };
+  return pyWorker; }
+let pyBaseReady=false;
+function setPre(pct, lab){ const f=$('#preFill'), p=$('#prePct'), l=$('#preLab'); if(f) f.style.width=pct+'%'; if(p) p.textContent=pct+'%'; if(l&&lab) l.textContent=lab; }
+function onPyProgress(stage){ if(stage==='base'){ pyBaseReady=true; const b=$('#preBar'); if(b&&!b.hidden) setPre(60,'运行环境已就绪 · 正在加载工具包'); } }
+function startPreheat(){
+  const bar=$('#preBar'); if(!pref.preheat){ if(bar) bar.hidden=true; return; }
+  ensurePyWorker(); if(!bar) return;
+  bar.hidden=false; bar.classList.remove('done');
+  if(pyBaseReady) setPre(85,'运行环境已就绪 · 正在加载工具包'); else setPre(12,'正在加载运行环境');
+  const l=LESSONS[cur], pkgs=(l&&l.coding&&l.coding.pkgs)||[], id=++pySeq;
+  pyPending[id]=d=>{
+    if(d&&(d.bootError||d.fatal)){ setPre(100,'预热未完成 · 判定时会自动加载'); }
+    else setPre(100,'就绪 · 写代码时不用等了');
+    const b=$('#preBar'); if(b){ setTimeout(()=>{ b.classList.add('done'); setTimeout(()=>{ b.hidden=true; },620); },1000); }
+  };
+  try{ pyWorker.postMessage({type:'preheat', id, pkgs}); }catch(e){}
+}
+function runPy(code, pkgs, files, checkFile, timeout){
+  return new Promise((resolve,reject)=>{
+    const w=ensurePyWorker(), id=++pySeq;
+    const timer=setTimeout(()=>{ delete pyPending[id]; try{pyWorker.terminate();}catch(e){} pyWorker=null; pyWarm=false; pyBaseReady=false; reject(new Error('timeout')); }, timeout);
+    pyPending[id]=d=>{ clearTimeout(timer); resolve(d); };
+    w.postMessage({id, code, pkgs, files, checkFile});
+  }); }
+const ERR_ZH={SyntaxError:'语法错误——多半是冒号、引号或括号没配对好。',IndentationError:'缩进错误——Python 靠缩进分代码块，该缩进的行要对齐。',NameError:'名字错误——变量名可能打错了，或者用之前还没赋值。',TypeError:'类型错误——比如字符串和数字直接相加，要先用 float() / int() 转换。',ValueError:'值不对——比如把不是数字的文字拿去 float()。',KeyError:'键不存在——字典里没有这个键，检查键名拼写。',IndexError:'下标越界——列表没有这么多元素，下标从 0 开始数。',ZeroDivisionError:'除以 0 了——除数不能是 0。',FileNotFoundError:'文件不存在——检查文件名和打开模式。',ModuleNotFoundError:'库导入失败——检查 import 的库名。',AttributeError:'属性/方法不存在——检查方法名拼写，比如 append、sort。'};
+function errLineOf(s){ const m=[...String(s).matchAll(/line (\d+)/g)]; return m.length?+m[m.length-1][1]:0; }
+const ZHMAP={'學':'学','習':'习','優':'优','圖':'图','總':'总','貴':'贵','筆':'笔','項':'项','滿':'满','數':'数','據':'据','讀':'读','寫':'写','檔':'档','錯':'错','麼':'么','這':'这','裡':'里','開':'开','點':'点','時':'时','長':'长','個':'个','們':'们','為':'为','應':'应','該':'该','會':'会','讓':'让','變':'变','環':'环','節':'节','錄':'录','統':'统','計':'计','價':'价','錢':'钱','買':'买','賣':'卖','飯':'饭','麵':'面','乾':'干','後':'后','裡':'里','麼':'么','過':'过','還':'还','進':'进','遠':'远','運':'运','動':'动','場':'场','國':'国','現':'现','實':'实','際':'际','發':'发','現':'现','將':'将','對':'对','來':'来','說':'说','請':'请','謝':'谢','歡':'欢','迎':'迎','麼':'么'};
+function normLine(s){ return String(s).replace(/[學學習優圖總貴筆項滿數據讀寫檔錯麼這裡開點時長個們為應該會讓變環節錄統計價錢買賣飯麵乾後過還進遠運動場國現實際發現將對來說請謝歡迎]/g, ch=>ZHMAP[ch]||ch); }
+const PUNCT={'，':',','。':'.','：':':','！':'!','？':'?','；':';','（':'(','）':')','“':'"','”':'"','‘':"'",'’':"'",'、':','};
+function normBase(s){ return normLine(s).replace(/[，。：！？；（）“”‘’、]/g, ch=>PUNCT[ch]||ch); }
+/* 输出判定：忽略所有空白、全半角标点、简繁字形差异；数字按数值比（带小容差）。内容本身必须一致。 */
+function judgeEq(e, a){
+  const x=normBase(e).replace(/\s+/g,''), y=normBase(a).replace(/\s+/g,'');
+  if(x===y) return true;
+  const nums=s=>[...s.matchAll(/-?\d+\.?\d*/g)].map(m=>parseFloat(m[0]));
+  const skel=s=>s.replace(/-?\d+\.?\d*/g,'#');
+  if(skel(x)!==skel(y)) return false;
+  const nx=nums(x), ny=nums(y); if(nx.length!==ny.length) return false;
+  return nx.every((v,i)=>Math.abs(v-ny[i])<=Math.max(1e-9, Math.abs(v)*1e-6));
+}
+function renderCoding(){
+  const box=$('#codeBox'); if(!box) return; const l=LESSONS[cur], c=l.coding; if(!c){ box.innerHTML=''; return; }
+  const doneC=store.codeDone.includes(l.gi);
+  box.innerHTML=`
+   <div class="code-task"><b>动手题 ·</b> ${c.task}</div>
+   <div class="editor"><div class="cb-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="fn">exercise.py</span><span style="margin-left:auto" class="score" id="codeState">${doneC?'✓ 已通过判定':'尚未通过判定'}</span></div>
+   <div class="ed-wrap"><div class="ed-gutter" id="edGutter"></div><textarea id="edCode" spellcheck="false">${esc(c.starter)}</textarea></div></div>
+   <div class="quiz-foot">
+     <button class="btn btn-gold" id="runJudge" style="padding:12px 28px;font-size:14.5px">▶ 运行并判定</button>
+     <button class="btn btn-ghost" id="resetCode" style="padding:12px 22px;font-size:14px">重置代码</button>
+     <span class="score">代码会在你的浏览器里真的运行，再逐行和标准输出对比，错在哪一行直接标出来。</span>
+   </div>
+   <div class="code-fb" id="codeFb"></div>`;
+  const ta=$('#edCode'), gut=$('#edGutter');
+  const syncGutter=(errLine)=>{ const n=ta.value.split('\n').length;
+    gut.innerHTML=Array.from({length:n},(_,k)=>`<div class="${errLine===k+1?'err-line':''}">${k+1}</div>`).join(''); gut.scrollTop=ta.scrollTop; };
+  codeCache[l.gi]=ta.value;
+  ta.addEventListener('input',()=>{ syncGutter(0); codeCache[l.gi]=ta.value; });
+  ta.addEventListener('scroll',()=>{ gut.scrollTop=ta.scrollTop; });
+  ta.addEventListener('keydown',e=>{ if(e.key==='Tab'){ e.preventDefault(); ta.setRangeText('  ',ta.selectionStart,ta.selectionEnd,'end'); syncGutter(0); } });
+  syncGutter(0);
+  $('#resetCode').onclick=()=>{ ta.value=c.starter; const fb=$('#codeFb'); fb.className='code-fb'; fb.innerHTML=''; syncGutter(0); };
+  $('#runJudge').onclick=()=>judgeCode(syncGutter);
+}
+async function judgeCode(syncGutter){
+  const l=LESSONS[cur], c=l.coding, fb=$('#codeFb'), btn=$('#runJudge');
+  const code=$('#edCode').value;
+  const cold=!pyWarm;
+  btn.disabled=true; btn.textContent=cold?'正在准备 Python 环境（首次下载可能要 1–3 分钟，看网络）…':'判定中…';
+  fb.className='code-fb show'; fb.innerHTML=cold?'<span class="fb-t">正在加载 Python 环境…</span><div style="margin-top:6px;color:var(--muted);font-size:13.5px">第一次运行要先下载运行环境，可能需要 1–3 分钟（看网络），之后每次判定只要几秒。请不要关掉页面。</div>':'<span class="fb-t">运行中…</span>';
+  const ime=scanIME(code);
+  if(ime){ btn.disabled=false; btn.textContent='▶ 运行并判定'; lastJudge[l.gi]='还没运行就被拦下：第 '+ime.line+' 行有中文输入法的全角符号「'+ime.ch+'」，要换成半角「'+ime.half+'」'; showIMEDiag(fb, ime); syncGutter(ime.line); return; }
+  const files={}; (c.files||[]).forEach(f=>{ if(f==='meals.csv') files[f]=MEALS_CSV; if(f==='ledger.csv') files[f]=LEDGER_CSV; });
+  let res;
+  try{ res=await runPy(code, c.pkgs||[], files, c.checkFile||null, cold?300000:25000); }
+  catch(e){ fb.className='code-fb show fail';
+    fb.innerHTML=cold?'<div class="fb-t">⏱ 环境加载太久</div>Python 环境下载超时，多半是网络较慢。刷新页面再试一次；加载成功过一次之后，后面每次判定只要几秒。':'<div class="fb-t">⏱ 运行超时</div>程序跑了很久没结束——多半是死循环：比如 while 循环里忘了写让条件变化的那一行。改好再试。';
+    btn.disabled=false; btn.textContent='▶ 运行并判定'; return; }
+  pyWarm=true; btn.disabled=false; btn.textContent='▶ 运行并判定';
+  if(res.bootError||res.fatal){ fb.className='code-fb show fail'; fb.innerHTML='<div class="fb-t">运行环境加载失败</div>多半是网络问题，刷新页面再试一次。'; return; }
+  if(!res.ok){ lastJudge[l.gi]='运行报错：'+String(res.error||'').split('\n').filter(Boolean).slice(-1)[0].slice(0,140); showCodeError(fb, code, res.error); syncGutter(errLineOf(res.error)); return; }
+  syncGutter(0);
+  const act=(res.out||[]).join('\n').split('\n').map(s=>s.replace(/\s+$/,''));
+  while(act.length&&act[act.length-1]==='') act.pop();
+  const exp=c.expected.map(s=>String(s).replace(/\s+$/,''));
+  /* 判定原则（站长要求放宽）：代码没有语法/运行错误，且期望的内容都按顺序出现了，就算通过；
+     多打印的行不扣分；空白、标点全半角、简繁、数字尾数差异都忽略。缺了期望内容才判错，并指出缺的是哪一行。 */
+  let ai=0, firstMissing=-1; const rows=[];
+  for(let ei=0; ei<exp.length; ei++){ let found=false;
+    while(ai<act.length){ if(judgeEq(exp[ei], act[ai])){ found=true; ai++; break; } ai++; }
+    if(!found){ firstMissing=ei; rows.push({e:exp[ei], ok:false}); for(let k=ei+1;k<exp.length;k++) rows.push({e:exp[k], ok:false}); break; }
+    rows.push({e:exp[ei], ok:true}); }
+  let fileOk=true; if(c.checkFile){ fileOk=!!res.fileExists; }
+  if(firstMissing<0&&fileOk){
+    lastJudge[l.gi]='判定通过：代码没有报错，期望的内容都出现了';
+    if(!store.codeDone.includes(l.gi)){ store.codeDone.push(l.gi); save(); }
+    $('#codeState').textContent='✓ 已通过判定';
+    fb.className='code-fb show pass';
+    fb.innerHTML=`<div class="fb-t">✓ 通过！</div>代码没有报错，期望的内容都出现了${act.length>exp.length?'（你多打印的行不扣分）':''}${c.checkFile?'，图文件也成功生成了':''}。这一课的动手题通过判定。`;
+    confettiBurst(); return;
+  }
+  fb.className='code-fb show fail';
+  lastJudge[l.gi]= firstMissing>=0 ? ('判定未通过：期望的第 '+(firstMissing+1)+' 行内容「'+exp[firstMissing]+'」没有在他的输出里出现，他的输出是「'+act.join(' / ')+'」') : '判定未通过：输出内容对了，但图文件 chart.png 没有生成';
+  let head;
+  if(firstMissing>=0){ head=`期望的第 ${firstMissing+1} 行内容没有在你的输出里出现（多打印的行没关系，缺了期望内容不行）。检查一下是不是少算了、少打印了，或者数字不对。`;
+    const skel=s=>normBase(s).replace(/-?\d+\.?\d*/g,'#').replace(/\s+/g,'');
+    const sib=act.find(a=>skel(a)===skel(exp[firstMissing]));
+    if(sib) head+=`<br>看起来你有一行结构是对的：「${esc(sib)}」，但数字和期望的「${esc(exp[firstMissing])}」不一样——多半是算错了，检查计算过程（有没有漏加一笔、单价用错）。`; }
+  else head='输出内容都对，但图文件 chart.png 没有生成——检查 savefig 那一行有没有写对、顺序是不是先画后存。';
+  fb.innerHTML=`<div class="fb-t">✗ 还差一点</div><div>${head}</div>
+   <table><tr><th>期望出现的内容</th><th style="width:76px">状态</th></tr>
+   ${rows.map(r=>`<tr class="${r.ok?'ok':'bad'}"><td>${esc(r.e)}</td><td>${r.ok?'✓ 已出现':'✗ 没出现'}</td></tr>`).join('')}</table>
+   <div style="margin-top:10px;color:var(--muted);font-size:13px">你的完整输出：</div>
+   <div class="src-line" style="color:#d8d5cc">${act.length? esc(act.join('\n')) : '（没有任何输出）'}</div>`;
+}
+/* ----- 错误原因诊断：全角符号（中文输入法）、缩进、漏冒号、引号、变量名打错 ----- */
+const FW={'（':'(','）':')','＂':'"','＇':"'",'：':':','；':';','，':',','．':'.','！':'!','？':'?','＝':'=','＋':'+','＜':'<','＞':'>','［':'[','］':']','｛':'{','｝':'}','％':'%','＊':'*','－':'-','＿':'_'};
+function scanIME(code){
+  const lines=code.split('\n'); let inStr=null, triple=false, esc=false;
+  for(let li=0; li<lines.length; li++){ const line=lines[li];
+    for(let ci=0; ci<line.length; ci++){ const ch=line[ci];
+      if(inStr){ if(esc){ esc=false; continue; } if(ch==='\\'){ esc=true; continue; }
+        if(triple){ if(line.substr(ci,3)===inStr){ inStr=null; triple=false; ci+=2; } continue; }
+        if(ch===inStr) inStr=null; continue; }
+      if(ch==='#') break;
+      if(ch==='"'||ch==="'"){ const t3=line.substr(ci,3), q3=ch+ch+ch;
+        if(t3===q3){ inStr=t3; triple=true; ci+=2; } else inStr=ch; continue; }
+      if(FW[ch]) return {line:li+1, ch, half:FW[ch], src:line};
+      if(ch==='\u3000') return {line:li+1, ch:'　', half:' ', src:line, space:true};
+    }
+    if(!triple) inStr=null;
+  }
+  return null;
+}
+function showIMEDiag(fb, ime){
+  fb.className='code-fb show fail';
+  fb.innerHTML=`<div class="fb-t">✗ 第 ${ime.line} 行有个符号是中文输入法打的</div>
+   <div>「${ime.space?'全角空格':ime.ch}」是<b>全角符号</b>，多半是打代码时输入法没切到英文。Python 只认半角符号，把它换成「${ime.space?'半角空格':ime.half}」再运行。字符串里面的中文标点没问题，指的是代码本身的符号。</div>
+   <div class="src-line">第 ${ime.line} 行：${esc(ime.src)}</div>`;
+}
+function lev(a,b){ const dp=[]; for(let i=0;i<=a.length;i++){ dp.push([i]); } for(let j=0;j<=b.length;j++) dp[0][j]=j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++) dp[i][j]=Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return dp[a.length][b.length]; }
+function suggestName(code, bad){
+  const names=new Set(); let m;
+  const pats=[/([A-Za-z_]\w*)\s*=/g, /def\s+([A-Za-z_]\w*)/g, /for\s+([A-Za-z_]\w*)\s+in/g, /import\s+([A-Za-z_]\w*)/g];
+  pats.forEach(re=>{ while((m=re.exec(code))) names.add(m[1]); });
+  let best=null, bd=3;
+  names.forEach(n=>{ const d=lev(bad,n); if(d<bd){ bd=d; best=n; } });
+  return bd<=2? best : null;
+}
+function showCodeError(fb, code, errStr){
+  const line=errLineOf(errStr), raw=String(errStr);
+  const tm=raw.match(/(SyntaxError|IndentationError|TabError|NameError|TypeError|ValueError|KeyError|IndexError|ZeroDivisionError|FileNotFoundError|ModuleNotFoundError|AttributeError)/);
+  const type=tm?tm[1]:'Error';
+  const srcLine=line? (code.split('\n')[line-1]||'') : '';
+  let cause='';
+  if(/invalid character/.test(raw)){ const cm=raw.match(/invalid character '(.)'/);
+    cause=`代码里混进了非法字符${cm?'「'+cm[1]+'」':''}——多半是中文输入法打出的全角符号，把它换成半角英文符号再试。`; }
+  else if(/expected ':'/.test(raw)) cause='这一行末尾漏了冒号「:」——if / else / elif / for / while / def 这些行，最后都要加一个半角冒号。';
+  else if(/unterminated string|EOL while scanning/.test(raw)) cause='引号没有关上——字符串前后的引号要成对、要是同一种，检查这一行的引号。';
+  else if(type==='IndentationError'||type==='TabError'){
+    if(/^\t/.test(srcLine)) cause='这一行开头用了 Tab 缩进，和其他行的空格缩进混在一起了——全篇统一用空格缩进（每层 4 个，或始终 2 个）。';
+    else if(/unindent does not match/.test(raw)) cause='这一行的缩进和它所属的那一层对不齐——Python 靠缩进分层，同一层的行必须完全对齐。';
+    else cause='缩进不对：if / for / while / def 的下一行要缩进一层（通常 4 个空格），不该缩进的行不要缩进。'; }
+  else if(type==='NameError'){ const nm=raw.match(/name '([^']+)' is not defined/);
+    if(nm&&(nm[1]==='pd'||nm[1]==='plt')) cause=`「${nm[1]}」没定义——多半是忘了在最前面先 import（import pandas as pd / import matplotlib.pyplot as plt）。`;
+    else if(nm){ const cand=suggestName(code, nm[1]);
+      cause=`名字「${nm[1]}」从来没有定义过。`+(cand?`你是不是想打「${cand}」？对照一下拼写。`:'看看是不是打错字，或者用它之前忘了先赋值（例如先写 '+nm[1]+' = ...）。'); }
+    else cause=ERR_ZH.NameError; }
+  else cause=ERR_ZH[type]||'看看报错信息，对照这一课的讲解再改。';
+  fb.className='code-fb show fail';
+  fb.innerHTML=`<div class="fb-t">✗ ${line?`第 ${line} 行出错`:'运行时出错'} · ${type}</div>
+   <div>${cause}</div>
+   ${srcLine?`<div class="src-line">第 ${line} 行：${esc(srcLine)}</div>`:''}
+   <div style="margin-top:8px;color:var(--muted);font-size:13px">原始报错：${esc(String(errStr).split('\n').filter(s=>s.trim()).slice(-1)[0]||'')}</div>`;
+}
+/* ---------- community wiring ---------- */
+const NOTES_LS='hobart-py-notes';
+let notes=[]; try{ notes=JSON.parse(localStorage.getItem(NOTES_LS)||'[]'); }catch(e){ notes=[]; }
+function renderNotes(){
+  const box=$('#noteList'); if(!box) return;
+  if(!notes.length){ box.innerHTML='<div class="note-empty">还没有心得。学完一课，回来记下第一句吧。</div>'; return; }
+  box.innerHTML=notes.map((n,i)=>`<div class="note-item"><div class="nh"><b>${esc(n.name||'匿名')}</b><span>${esc(n.time)}</span><button data-del="${i}">删除</button></div><div class="nt">${esc(n.text)}</div></div>`).join('');
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ notes.splice(+b.dataset.del,1); localStorage.setItem(NOTES_LS,JSON.stringify(notes)); renderNotes(); });
+}
+$('#noteAdd').onclick=()=>{
+  const text=$('#noteText').value.trim(); if(!text){ $('#noteText').focus(); return; }
+  const now=new Date(); const pad=x=>String(x).padStart(2,'0');
+  notes.unshift({name:$('#noteName').value.trim(), text, time:`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`});
+  localStorage.setItem(NOTES_LS,JSON.stringify(notes));
+  $('#noteText').value=''; renderNotes(); confettiBurst();
+};
+$('#fbGo').onclick=()=>{
+  const type=$('#fbType').value, text=$('#fbText').value.trim();
+  if(!text){ $('#fbText').focus(); return; }
+  const title=encodeURIComponent(`[反馈][${type}] `+text.slice(0,40));
+  const body=encodeURIComponent(`**反馈类型：** ${type}\n\n${text}\n\n——来自 hobartsze.github.io 交流与反馈区`);
+  open(`https://github.com/HobartSZE/HobartSZE.github.io/issues/new?title=${title}&body=${body}`,'_blank');
+};
+renderNotes();
+/* ---------- polish wiring ---------- */
+addEventListener('scroll',()=>{
+  const h=document.documentElement, p=h.scrollTop/(h.scrollHeight-h.clientHeight||1);
+  $('#scrollProg').style.width=(p*100)+'%';
+  $('#toTop').classList.toggle('show',h.scrollTop>700);
+  const ide=$('#heroIde'); if(ide&&h.scrollTop<900&&!reduced) ide.style.transform=`translateY(${h.scrollTop*-0.03}px)`;
+},{passive:true});
+$('#toTop').onclick=()=>scrollTo({top:0,behavior:reduced?'auto':'smooth'});
+let glowEvt=null, glowTick=false;
+function glowPoint(cx,cy){ const g=$('#heroGlow'); if(!g)return; const r=$('.hero').getBoundingClientRect();
+  g.style.opacity='1'; g.style.transform='translate3d('+(cx-r.left)+'px,'+(cy-r.top)+'px,0) translate(-50%,-50%)'; }
+$('.hero').addEventListener('mouseleave',()=>{ const g=$('#heroGlow'); if(g) g.style.opacity='0'; });
+(function(){ const h=$('.hero'); if(h){ const r=h.getBoundingClientRect(), g=$('#heroGlow');
+  if(g) g.style.transform='translate3d('+(r.width*0.7)+'px,'+(r.height*0.24)+'px,0) translate(-50%,-50%)'; } })();
+$('.hero').addEventListener('mousemove',e=>{ glowEvt=e; if(glowTick) return; glowTick=true;
+  requestAnimationFrame(()=>{ glowTick=false; if(glowEvt) glowPoint(glowEvt.clientX,glowEvt.clientY); }); },{passive:true});
+document.addEventListener('keydown',e=>{ if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){ e.preventDefault(); $('#searchBox').focus(); $('#searchBox').scrollIntoView({behavior:'smooth',block:'center'}); } });
+function paintMajor(){ const a=$('#majorAcct'), g=$('#majorGen'); if(a) a.classList.toggle('on', pref.major!=='general'); if(g) g.classList.toggle('on', pref.major==='general'); }
+function setMajor(m){ if(pref.major===m) return; pref.major=m; savePref(); paintMajor(); renderRoute(); if(typeof renderBadges==='function') renderBadges(); const caps=$$('.stat .t'); if(caps[3]) caps[3].textContent=STAGES.map(s=>stageName(s)).join(' · '); if(cur>=0 && $('#overlay').classList.contains('open')) openLesson(cur); }
+const _ma=$('#majorAcct'), _mg=$('#majorGen'); if(_ma) _ma.onclick=()=>setMajor('acct'); if(_mg) _mg.onclick=()=>setMajor('general'); paintMajor();
+renderRoute(); heroLoop();
+</script>
+<script src="assets/three.min.js"></script>
+<script>
+(function(){
+  var cv=document.getElementById('globeCv');
+  var state=document.getElementById('gestureState'), btn=document.getElementById('gestureBtn'), video=document.getElementById('gestureCam');
+  if(!cv||typeof THREE==='undefined'){ if(state) state.textContent='地球加载失败（网络问题），刷新再试'; return; }
+  var wrap=cv.parentElement;
+  var renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  var scene=new THREE.Scene();
+  var cam=new THREE.PerspectiveCamera(38,1,0.1,200); cam.position.set(0,0,3.5);
+  var group=new THREE.Group(); scene.add(group);
+  scene.add(new THREE.AmbientLight(0xffffff,0.55));
+  var sun=new THREE.DirectionalLight(0xffffff,1.15); sun.position.set(5,2,4); scene.add(sun);
+  var TEX='textures/';
+  var loader=new THREE.TextureLoader(); loader.crossOrigin='anonymous';
+  var earthMat=new THREE.MeshPhongMaterial({ color:0x16233c, specular:new THREE.Color(0x2a4a66), shininess:14 });
+  var earth=new THREE.Mesh(new THREE.SphereGeometry(1,72,72), earthMat);
+  group.add(earth);
+  var loadEl=document.getElementById('globeLoading');
+  function dayReady(t){ earthMat.map=t; earthMat.color.set(0xffffff); earthMat.needsUpdate=true; if(loadEl) loadEl.classList.add('off');
+    loader.load(TEX+'earth-normal.jpg', function(n){ earthMat.normalMap=n; earthMat.normalScale=new THREE.Vector2(0.85,0.85); earthMat.needsUpdate=true; });
+    loader.load(TEX+'earth-specular.jpg', function(s){ earthMat.specularMap=s; earthMat.needsUpdate=true; });
+    loader.load(TEX+'earth-clouds.png', function(ct){ var c=new THREE.Mesh(new THREE.SphereGeometry(1.012,48,48), new THREE.MeshLambertMaterial({map:ct,transparent:true,opacity:0.5,depthWrite:false})); c.name='clouds'; group.add(c); });
+  }
+  loader.load('textures/earth-day.jpg', dayReady, undefined,
+    function(){ loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/textures/planets/earth_atmos_2048.jpg', dayReady); });
+  var atm=new THREE.Mesh(new THREE.SphereGeometry(1.14,48,48), new THREE.ShaderMaterial({
+    vertexShader:'varying vec3 vN; void main(){ vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+    fragmentShader:'varying vec3 vN; void main(){ float d=dot(vN,vec3(0.0,0.0,1.0)); float i=pow(max(0.62-d,0.0),4.0)*0.55; gl_FragColor=vec4(0.32,0.5,0.95,1.0)*i; }',
+    blending:THREE.AdditiveBlending, side:THREE.BackSide, transparent:true, depthWrite:false }));
+  scene.add(atm);
+  (function(){ var n=900, pos=new Float32Array(n*3);
+    for(var i=0;i<n;i++){ var r=30+Math.random()*50, th=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1);
+      pos[i*3]=r*Math.sin(ph)*Math.cos(th); pos[i*3+1]=r*Math.cos(ph)*0.6; pos[i*3+2]=r*Math.sin(ph)*Math.sin(th); }
+    var g=new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    scene.add(new THREE.Points(g, new THREE.PointsMaterial({color:0x93a7cc,size:0.14,transparent:true,opacity:0.85}))); })();
+  function llToV(lat,lon,r){ var phi=(90-lat)*Math.PI/180, th=(lon+180)*Math.PI/180;
+    return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(th), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(th)); }
+  var gz=llToV(23.13,113.26,1.005);
+  var dot=new THREE.Mesh(new THREE.SphereGeometry(0.012,12,12), new THREE.MeshBasicMaterial({color:0xf5c65c}));
+  dot.position.copy(gz); group.add(dot);
+  var ring=new THREE.Mesh(new THREE.RingGeometry(0.02,0.028,32), new THREE.MeshBasicMaterial({color:0xf5c65c,transparent:true,opacity:0.9,side:THREE.DoubleSide}));
+  ring.position.copy(gz.clone().multiplyScalar(1.002)); ring.lookAt(gz.clone().multiplyScalar(2)); group.add(ring);
+  var idleCaption='拖动旋转 · 滚轮缩放 · 金点是广州';
+  var faceT=false, faceY=2.74, faceX=0.25;
+  function setMarker(lat,lon,face){ var p=llToV(lat,lon,1.005); dot.position.copy(p);
+    ring.position.copy(p.clone().multiplyScalar(1.002)); ring.lookAt(p.clone().multiplyScalar(2));
+    if(face){ var q=llToV(lat,lon,1); faceY=Math.atan2(-q.x,q.z); faceX=Math.max(-0.9,Math.min(0.9,lat*Math.PI/180*0.55)); faceT=true; } }
+  var rotX=0.25, rotY=2.74, vX=0, vY=0.0016, zoom=3.5, tZoom=3.5, dragging=false, px=0, py=0, visible=true, gesture=false;
+  function resize(){ var w=wrap.clientWidth||480; renderer.setSize(w,w,false); cam.aspect=1; cam.updateProjectionMatrix(); }
+  resize(); addEventListener('resize',resize);
+  cv.addEventListener('pointerdown',function(e){ dragging=true; faceT=false; px=e.clientX; py=e.clientY; try{ cv.setPointerCapture(e.pointerId); }catch(err){} });
+  cv.addEventListener('pointermove',function(e){ if(!dragging) return; var dx=e.clientX-px, dy=e.clientY-py; px=e.clientX; py=e.clientY;
+    vY=dx*0.00045; vX=dy*0.00045; rotY+=dx*0.005; rotX=Math.max(-0.9,Math.min(0.9,rotX+dy*0.005)); });
+  function endDrag(){ dragging=false; }
+  cv.addEventListener('pointerup',endDrag); cv.addEventListener('pointercancel',endDrag);
+  cv.addEventListener('wheel',function(e){ e.preventDefault(); tZoom=Math.max(3.25,Math.min(5.0,tZoom+e.deltaY*0.0022)); },{passive:false});
+  if('IntersectionObserver' in window){ new IntersectionObserver(function(en){ visible=en[0].isIntersecting; },{threshold:0.02}).observe(wrap); }
+  var lastT=performance.now();
+  (function loop(now){ requestAnimationFrame(loop); if(!visible||document.hidden){ lastT=now; return; }
+    var dt=Math.min(0.05,Math.max(0.001,(now-lastT)/1000)); lastT=now; var steps=dt*60;
+    if(!dragging){ if(faceT){ var dy=faceY-rotY; while(dy>Math.PI)dy-=2*Math.PI; while(dy<-Math.PI)dy+=2*Math.PI;
+        var fk=Math.min(1,0.055*steps); rotY+=dy*fk; rotX+=(faceX-rotX)*fk;
+        if(Math.abs(dy)<0.01&&Math.abs(faceX-rotX)<0.01) faceT=false; }
+      else { rotY+=vY*steps; rotX+=vX*steps;
+        if(!gesture){ vY+=(0.0016-vY)*Math.min(1,0.02*steps); vX*=Math.pow(0.95,steps); }
+        else { var kk=1-Math.pow(0.7,steps); vY+=(tVY-vY)*kk; vX+=(tVX-vX)*kk; var td=Math.pow(0.86,steps); tVY*=td; tVX*=td; } }
+      rotX=Math.max(-0.9,Math.min(0.9,rotX)); }
+    zoom+=(tZoom-zoom)*(1-Math.pow(0.92,steps)); cam.position.z=zoom;
+    group.rotation.y=rotY; group.rotation.x=rotX;
+    var cl=group.getObjectByName('clouds'); if(cl) cl.rotation.y+=0.0004*steps;
+    var s=1+0.25*Math.sin(now*0.003); ring.scale.set(s,s,s);
+    renderer.render(scene,cam);
+  })(performance.now());
+  /* ----- visitor location: IP-based (no permission prompt), timezone fallback, else Guangzhou ----- */
+  var TZMAP={'Asia/Shanghai':[31.2,121.5],'Asia/Hong_Kong':[22.3,114.2],'Asia/Taipei':[25.0,121.6],'Asia/Tokyo':[35.7,139.7],'Asia/Singapore':[1.35,103.8],'Asia/Seoul':[37.6,127.0],'Asia/Bangkok':[13.8,100.5],'Asia/Kolkata':[22.6,88.4],'Asia/Dubai':[25.2,55.3],'Asia/Jakarta':[-6.2,106.8],'Asia/Manila':[14.6,121.0],'Asia/Ho_Chi_Minh':[10.8,106.7],'Asia/Kuala_Lumpur':[3.1,101.7],'Europe/London':[51.5,-0.13],'Europe/Paris':[48.9,2.35],'Europe/Berlin':[52.5,13.4],'Europe/Moscow':[55.8,37.6],'America/New_York':[40.7,-74.0],'America/Chicago':[41.9,-87.6],'America/Denver':[39.7,-105.0],'America/Los_Angeles':[34.1,-118.2],'America/Toronto':[43.7,-79.4],'America/Sao_Paulo':[-23.6,-46.6],'Australia/Sydney':[-33.9,151.2],'Pacific/Auckland':[-36.8,174.8],'Africa/Cairo':[30.0,31.2]};
+  function fetchLoc(url,parse){ return new Promise(function(res){ var ctl=('AbortController' in window)?new AbortController():null;
+    var to=setTimeout(function(){ if(ctl) ctl.abort(); res(null); },3500);
+    fetch(url, ctl?{signal:ctl.signal}:{}).then(function(r){ return r.json(); }).then(function(j){ clearTimeout(to); res(parse(j)); }).catch(function(){ clearTimeout(to); res(null); }); }); }
+  (async function locate(){
+    var p=null;
+    try{ p=await fetchLoc('https://ipwho.is/', function(j){ return (j&&j.success!==false&&isFinite(j.latitude)&&isFinite(j.longitude))?{lat:+j.latitude,lon:+j.longitude}:null; }); }catch(e){}
+    if(!p){ try{ p=await fetchLoc('https://ipapi.co/json/', function(j){ return (j&&isFinite(j.latitude)&&isFinite(j.longitude))?{lat:+j.latitude,lon:+j.longitude}:null; }); }catch(e){} }
+    if(!p){ try{ var tz=Intl.DateTimeFormat().resolvedOptions().timeZone, m=TZMAP[tz]; if(m) p={lat:m[0],lon:m[1]}; }catch(e){} }
+    if(!p) return;
+    if(Math.abs(p.lat-23.13)<0.6&&Math.abs(p.lon-113.26)<0.6) return;
+    setMarker(p.lat,p.lon,true);
+    idleCaption='拖动旋转 · 滚轮缩放 · 金点是你所在的位置';
+    if(state&&state.textContent.indexOf('金点是广州')>=0) state.textContent=idleCaption;
+  })();
+  /* ----- gesture control: MediaPipe Hands, processed locally, never uploaded ----- */
+  var hands=null, mpCam=null, lastPalm=null;
+  function loadScript(src){ return new Promise(function(res,rej){ var s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+  function setState(t){ if(state) state.textContent=t; }
+  var lastSay='', resultsSeen=false;
+  function say(t){ if(t!==lastSay){ lastSay=t; setState(t); } }
+  var swipeOrigin=null, lastSwipeAt=0, tVX=0, tVY=0;
+  function onResults(res){
+    if(!res.multiHandLandmarks||!res.multiHandLandmarks.length){ lastPalm=null; swipeOrigin=null; tVX=0; tVY=0; say('把手对准摄像头，掌心对着镜头，移动手掌或挥手就能旋转'); return; }
+    resultsSeen=true;
+    var lm=res.multiHandLandmarks[0];
+    var palm={x:(lm[0].x+lm[9].x)/2, y:(lm[0].y+lm[9].y)/2};
+    var now=performance.now();
+    if(lastPalm){ var fx=palm.x-lastPalm.x, fy=palm.y-lastPalm.y;
+      tVY=Math.max(-0.13,Math.min(0.13, tVY-fx*1.2)); tVX=Math.max(-0.10,Math.min(0.10, tVX+fy*0.92)); }
+    if(!swipeOrigin){ swipeOrigin=palm; say('手势中：移动手掌地球跟着转，挥手转得更多'); }
+    else { var dx=palm.x-swipeOrigin.x, dy=palm.y-swipeOrigin.y, dist=Math.hypot(dx,dy);
+      if(dist>0.075 && now-lastSwipeAt>120){ var mag=Math.min(2.4, dist/0.075);
+        vY += -(dx/dist)*0.04*mag; vX += (dy/dist)*0.03*mag;
+        vY=Math.max(-0.2,Math.min(0.2,vY)); vX=Math.max(-0.15,Math.min(0.15,vX));
+        tVY=vY; tVX=vX;
+        swipeOrigin=palm; lastSwipeAt=now; say('手势中：挥手旋转地球'); }
+    }
+    lastPalm=palm;
+  }
+  async function startGesture(){
+    btn.disabled=true; setState('正在打开摄像头…（画面只在本机处理，绝不上传）');
+    try{
+      if(!hands){
+        await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js');
+        await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js');
+        hands=new Hands({locateFile:function(f){ return 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/'+f; }});
+        hands.setOptions({maxNumHands:1, modelComplexity:0, minDetectionConfidence:0.5, minTrackingConfidence:0.4});
+        hands.onResults(onResults);
+      }
+      mpCam=new Camera(video,{onFrame:async function(){ await hands.send({image:video}); }, width:640, height:360});
+      await mpCam.start();
+      gesture=true; faceT=false; resultsSeen=false; video.classList.add('on'); btn.textContent='✋ 关闭手势控制';
+      setState('把手对准摄像头：移动手掌或挥手就能旋转地球（手势只管旋转，缩放请用滚轮）');
+      setTimeout(function(){ if(gesture&&!resultsSeen) say('还没识别到手：手掌正对摄像头、光线亮一点；若一直没反应，可能是识别组件没加载完，关掉手势再开一次'); }, 6000);
+    }catch(err){ setState('摄像头没打开（权限或设备问题），已切回鼠标/触摸控制'); gesture=false; }
+    btn.disabled=false;
+  }
+  function stopGesture(){
+    gesture=false; video.classList.remove('on'); btn.textContent='✋ 开启手势控制';
+    try{ if(mpCam) mpCam.stop(); }catch(e){}
+    if(video.srcObject){ video.srcObject.getTracks().forEach(function(t){ t.stop(); }); video.srcObject=null; }
+    tVX=0; tVY=0; setState(idleCaption);
+  }
+  btn.addEventListener('click',function(){ gesture? stopGesture() : startGesture(); });
+})();
+</script>
+</body>
+</html>
