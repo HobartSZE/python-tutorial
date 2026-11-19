@@ -785,8 +785,6 @@ function openLesson(i){
    <div class="sec-t">动手写 · 即刻判定<label class="pref-t" title="打开课程时在后台提前加载 Python 运行环境，写代码时不用等冷启动"><input type="checkbox" id="prefHeat">预热运行环境</label></div>
    <div class="prebar" id="preBar" hidden><div class="pre-row"><span id="preLab">正在加载运行环境</span><b id="prePct">0%</b></div><div class="pre-track"><div class="pre-fill" id="preFill"></div></div></div>
    <div id="codeBox"></div>
-   <div class="sec-t">AI 讲解 · 接入自己的 AI</div>
-   <div id="aiBox"></div>
    <div class="sh-nav">
      <button class="btn btn-ghost" id="prevBtn" ${i===0?'disabled style="opacity:.4"':''}>← 上一课</button>
      <button class="btn btn-ghost" id="nextBtn" ${i===LESSONS.length-1?'disabled style="opacity:.4"':''}>下一课 →</button>
@@ -804,7 +802,7 @@ function openLesson(i){
   $('#runBtn').onclick=runDemo;
   const db=$('#demoBox');
   if(db && !reduced && 'IntersectionObserver' in window){ const dio=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.intersectionRatio>=0.5){ dio.disconnect(); const b=$('#runBtn'); if(b && !b.disabled && b.textContent.indexOf('再跑')<0) runDemo(); } }); },{threshold:[0.5]}); dio.observe(db); }
-  renderQuiz(); renderCoding(); renderAiBox();
+  renderQuiz(); renderCoding();
   $$('#sheet .trace').forEach(wireTrace);
   const nm=MEDIA[i+1]; if(nm){ try{ const pim=new Image(); pim.src='assets/lessons/'+nm[0]; }catch(e){} }
 }
@@ -887,7 +885,7 @@ $('#searchBox').addEventListener('input',e=>{
 });
 /* ---------- AI tutor (bring your own key) ---------- */
 const AI_LS='hobart-py-ai';
-const PRESETS=[['OpenAI','https://api.openai.com/v1','gpt-4o-mini'],['DeepSeek','https://api.deepseek.com/v1','deepseek-chat'],['通义千问（兼容模式）','https://dashscope.aliyuncs.com/compatible-mode/v1','qwen-plus'],['硅基流动','https://api.siliconflow.com/v1','deepseek-ai/DeepSeek-V3'],['自定义','','']];
+const PRESETS=[['OpenAI','https://api.openai.com/v1','gpt-4o-mini'],['DeepSeek','https://api.deepseek.com/v1','deepseek-chat'],['通义千问（兼容模式）','https://dashscope.aliyuncs.com/compatible-mode/v1','qwen-plus'],['硅基流动','https://api.siliconflow.cn/v1','deepseek-ai/DeepSeek-V3'],['自定义','','']];
 let aiCfg=null; try{ aiCfg=JSON.parse(localStorage.getItem(AI_LS)||'null'); }catch(e){ aiCfg=null; }
 function aiReady(){ return !!(aiCfg&&aiCfg.key&&aiCfg.base&&aiCfg.model); }
 function openAiModal(){
@@ -907,89 +905,17 @@ $('#aiSave').onclick=()=>{
   aiCfg={base:$('#aiBase').value.trim().replace(/\/+$/,''), key:$('#aiKey').value.trim(), model:$('#aiModel').value.trim()};
   if(!aiReady()){ $('#aiState').textContent='三项都要填：接口地址、Key、模型'; return; }
   localStorage.setItem(AI_LS,JSON.stringify(aiCfg));
-  $('#aiState').textContent='已保存 · '+aiCfg.model; renderAiBox();
+  $('#aiState').textContent='已保存 · '+aiCfg.model;
   setTimeout(closeAiModal,650);
 };
-$('#aiClear').onclick=()=>{ localStorage.removeItem(AI_LS); aiCfg=null; $('#aiKey').value=''; $('#aiState').textContent='已清除'; renderAiBox(); };
+$('#aiClear').onclick=()=>{ localStorage.removeItem(AI_LS); aiCfg=null; $('#aiKey').value=''; $('#aiState').textContent='已清除'; };
 const codeCache={}, lastJudge={};
 const CHATS_LS='hobart-py-ai-chats';
 let aiChats={}; try{ aiChats=JSON.parse(localStorage.getItem(CHATS_LS)||'{}'); }catch(e){ aiChats={}; }
 function saveChats(){ try{ localStorage.setItem(CHATS_LS, JSON.stringify(aiChats)); }catch(e){} }
 function chatOf(gi){ if(!aiChats[gi]) aiChats[gi]=[]; return aiChats[gi]; }
 function bubbleHtml(m){ return m.role==='user' ? `<div class="msg u">${esc(m.content)}</div>` : `<div class="msg a">${fmtAi(m.content)}</div>`; }
-function renderAiBox(){
-  const box=$('#aiBox'); if(!box) return;
-  if(!aiReady()){
-    box.innerHTML=`<div class="why show">这一课想问更深、或者想要个生活化的讲解？接入你自己的 AI 就能直接问它，还能连续追问。<br>本站不提供 AI 服务，也拿不到你的 Key——Key 只存在你自己的浏览器里，费用算你自己的账号。</div>
-    <div class="quiz-foot"><button class="btn btn-gold" id="aiOpen2" style="padding:11px 26px;font-size:14px">接入我的 AI</button></div>`;
-    $('#aiOpen2').onclick=openAiModal; return;
-  }
-  const l=LESSONS[cur], chat=chatOf(l.gi);
-  box.innerHTML=`
-  <div class="ai-thread" id="aiThread">${chat.length? chat.map(m=>bubbleHtml(m)).join('') : '<div class="msg a">我是这一课的 AI 讲解员。这一课里你选错的题、写过的代码和判定结果我都看得到，可以针对你错的地方讲；还能连续追问，回答时你也能随时插话打断我。</div>'}</div>
-  <div class="ai-qrow" style="margin-top:12px"><input id="aiQ" type="text" placeholder="接着问…（Enter 发送）"><button class="btn btn-gold" id="aiAsk" style="padding:11px 22px;font-size:14px">发送</button></div>
-  <div class="quiz-foot" style="margin-top:10px"><button class="btn btn-ghost" id="aiExplain" style="padding:9px 20px;font-size:13px">让 AI 讲解这一课</button><button class="btn btn-ghost" id="aiStop" style="padding:9px 20px;font-size:13px;display:none">停止生成</button><button class="btn btn-ghost" id="aiReset" style="padding:9px 20px;font-size:13px">清空对话</button><span class="score">当前模型 · ${esc(aiCfg.model)} · AI 看得到你的作答 · 回答中可插话</span></div>`;
-  const th=$('#aiThread'); th.scrollTop=th.scrollHeight;
-  const send=()=>{ const v=$('#aiQ').value.trim(); if(v){ $('#aiQ').value=''; askAI(v); } };
-  $('#aiAsk').onclick=send;
-  $('#aiQ').addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
-  $('#aiExplain').onclick=()=>askAI('请讲解这一课的核心概念，配一个生活化的例子，再提醒一个最容易踩的坑。');
-  $('#aiStop').onclick=()=>{ if(aiAbort) aiAbort.abort(); };
-  $('#aiReset').onclick=()=>{ if(aiAbort) aiAbort.abort(); aiChats[l.gi]=[]; saveChats(); renderAiBox(); };
-}
 function fmtAi(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`\n]+)`/g,'<code>$1</code>'); }
-let aiAbort=null, aiSeq=0;
-function attemptContext(l){
-  const parts=[];
-  (l.quiz||[]).forEach((q,qi)=>{ const a=store.answers[l.gi+'-'+qi];
-    if(a!==undefined&&a!==null) parts.push('选择题'+(qi+1)+'：'+q.q+'\n他的选择：'+q.opts[a]+'（'+(a===q.ans?'答对了':'答错了')+'）\n正确答案：'+q.opts[q.ans]+(q.why?'；解析：'+q.why:'')); });
-  if(l.coding){ const code=codeCache[l.gi], j=lastJudge[l.gi];
-    if(code) parts.push('动手题：'+l.coding.task+'\n他最近写的代码：\n'+code+(j?'\n最近一次判定：'+j:''));
-    else if(j) parts.push('动手题最近一次判定：'+j); }
-  return parts.length? '【他的作答情况——请结合这些来回答，重点讲他做错、卡住的地方；练习题仍只给提示和思路，不给完整答案】\n'+parts.join('\n\n') : '';
-}
-async function askAI(q){
-  const l=LESSONS[cur], chat=chatOf(l.gi), th=$('#aiThread'); if(!th) return;
-  if(aiAbort) aiAbort.abort();
-  const mySeq=++aiSeq;
-  chat.push({role:'user', content:q}); if(chat.length>40) chat.splice(0, chat.length-40); saveChats();
-  th.insertAdjacentHTML('beforeend', bubbleHtml({role:'user',content:q}));
-  const bub=document.createElement('div'); bub.className='msg a'; bub.textContent='思考中…'; th.appendChild(bub);
-  th.scrollTop=th.scrollHeight;
-  const stopBtn=$('#aiStop'); if(stopBtn) stopBtn.style.display='';
-  const sys='你是一位耐心的 Python 编程老师，正在辅导一位会计专业大一学生自学 Python。用简体中文、通俗易懂地讲解，多用生活例子（记账、金额、问卷）。如果学生问的是练习题，不要直接给答案，只给提示和思路，引导他自己想出来。结合之前的对话回答追问。回答控制在 300 字以内，分段清晰。';
-  const ctx='当前课程：第 '+(l.gi+1)+' 课《'+dispTitle(l)+'》\n讲解：'+dispExplain(l)+'\n注意点：'+l.tip+'\n示例代码：\n'+l.code+'\n运行结果：'+l.out.join(' / ');
-  const att=attemptContext(l);
-  const hist=chat.slice(-12);
-  const msgs=[{role:'system',content:sys}];
-  if(att) msgs.push({role:'system',content:att});
-  hist.forEach((m,i)=>{ msgs.push({role:m.role, content:(i===0&&m.role==='user')? ctx+'\n\n学生的问题：'+m.content : m.content}); });
-  const ctrl=new AbortController(); aiAbort=ctrl;
-  let acc='', settled=false;
-  try{
-    const r=await fetch(aiCfg.base+'/chat/completions',{method:'POST', signal:ctrl.signal,
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiCfg.key},
-      body:JSON.stringify({model:aiCfg.model,temperature:0.7,stream:true,messages:msgs})});
-    if(!r.ok){ const j=await r.json().catch(()=>null); throw new Error('请求失败：'+((j&&j.error&&j.error.message)||('HTTP '+r.status))+'。请检查接口地址、Key 和模型名。'); }
-    const ct=(r.headers.get('content-type')||'');
-    if(ct.includes('text/event-stream')&&r.body&&r.body.getReader){
-      const reader=r.body.getReader(), dec=new TextDecoder(); let buf='';
-      while(true){ const rd=await reader.read(); if(rd.done) break;
-        buf+=dec.decode(rd.value,{stream:true});
-        let idx; while((idx=buf.indexOf('\n'))>=0){ const line=buf.slice(0,idx).trim(); buf=buf.slice(idx+1);
-          if(line.startsWith('data:')){ const data=line.slice(5).trim();
-            if(data&&data!=='[DONE]'){ try{ const jj=JSON.parse(data); const delta=jj.choices&&jj.choices[0]&&jj.choices[0].delta&&jj.choices[0].delta.content;
-              if(delta){ acc+=delta; if(mySeq===aiSeq){ bub.innerHTML=fmtAi(acc); th.scrollTop=th.scrollHeight; } } }catch(e){} } } }
-      }
-    } else { const j=await r.json(); const t=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content; if(t) acc=t; }
-    settled=true;
-  }catch(err){
-    if(err&&err.name==='AbortError'){ if(acc){ acc+='\n\n（已被打断）'; settled=true; } else if(mySeq===aiSeq){ bub.textContent='（已停止生成）'; } }
-    else { if(mySeq===aiSeq){ bub.classList.add('err'); bub.textContent=(err&&err.message?err.message:'请求没有发出去：可能是网络问题，或者该接口不允许浏览器直接调用（跨域限制）。')+'这条不计入对话，可以直接重发。'; } chat.pop(); saveChats(); }
-  }
-  if(settled&&acc){ chat.push({role:'assistant', content:acc}); saveChats(); if(mySeq===aiSeq) bub.innerHTML=fmtAi(acc); }
-  if(mySeq===aiSeq){ aiAbort=null; if(stopBtn) stopBtn.style.display='none'; th.scrollTop=th.scrollHeight; }
-}
 /* ---------- per-exercise AI panels: a mini tutor under each question ---------- */
 const exOpen={}, exAbort={}, exSeq={};
 function exKeyQ(n){ return 'ex:'+LESSONS[cur].gi+'-q'+n; }
@@ -1000,7 +926,7 @@ function exPanelHtml(key){
   if(open){
     if(aiReady()){
       body=`<div class="ai-thread ex-thread">${chat.length? chat.map(m=>bubbleHtml(m)).join('') : '<div class="msg a">这道题卡住了？我看得到题目、选项和你现在的作答。先说说你卡在哪一步，我给你提示和思路，不直接报答案。</div>'}</div>
-      <div class="ai-qrow"><input type="text" class="ex-q" placeholder="问这道题…（Enter 发送）"><button class="btn btn-gold ex-send" style="padding:10px 20px;font-size:13.5px">发送</button><button class="btn btn-ghost ex-stop" style="padding:10px 16px;font-size:13.5px;${exAbort[key]?'':'display:none'}">停止</button></div>`;
+      <div class="ai-qrow"><input type="text" class="ex-q" placeholder="问这道题…（Enter 发送）"><button class="btn btn-gold ex-send" style="padding:10px 20px;font-size:13.5px">发送</button><button class="btn btn-ghost ex-stop" style="padding:10px 16px;font-size:13.5px;${exAbort[key]?'':'display:none'}">停止</button><button class="btn btn-ghost ex-clear" style="padding:10px 16px;font-size:13.5px">清空对话</button></div>`;
     } else {
       body=`<div class="why show" style="margin-top:12px">想让 AI 针对这一道题给你讲解，先接入你自己的 AI（Key 只存在你自己的浏览器里）。</div>
       <div class="quiz-foot" style="margin-top:12px"><button class="btn btn-gold ex-open-ai" style="padding:9px 22px;font-size:13.5px">接入我的 AI</button></div>`;
@@ -1017,6 +943,7 @@ function mountExPanel(wrap){
   if(inp&&sendBtn){ const send=()=>{ const v=inp.value.trim(); if(v){ inp.value=''; askExAI(key, v, wrap); } };
     sendBtn.onclick=send; inp.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); }); }
   const stopBtn=wrap.querySelector('.ex-stop'); if(stopBtn) stopBtn.onclick=()=>{ if(exAbort[key]) exAbort[key].abort(); };
+  const clrBtn=wrap.querySelector('.ex-clear'); if(clrBtn) clrBtn.onclick=()=>{ if(exAbort[key]) exAbort[key].abort(); exAbort[key]=null; exSeq[key]=(exSeq[key]||0)+1; delete aiChats[key]; saveChats(); mountExPanel(wrap); };
   const oa=wrap.querySelector('.ex-open-ai'); if(oa) oa.onclick=openAiModal;
   const th=wrap.querySelector('.ex-thread'); if(th) th.scrollTop=th.scrollHeight;
 }
