@@ -61,7 +61,8 @@ h1 .grad{background:linear-gradient(100deg,var(--gold2) 10%,#ffdf9e 45%,var(--go
 .btn-ghost:hover::before{transform:scaleX(1)}
 .btn-ghost:hover{border-color:rgba(245,198,92,.55)}
 .btn-gold::after{content:"";position:absolute;top:0;bottom:0;left:0;width:60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:translateX(-170%) skewX(-18deg);transition:transform 1s cubic-bezier(.22,1,.36,1);pointer-events:none}
-.btn-gold:hover::after{transform:translateX(240%) skewX(-18deg)}
+.btn-gold:hover::after{animation:sheenPass 2.6s cubic-bezier(.22,1,.36,1) infinite}
+@keyframes sheenPass{0%{transform:translateX(-170%) skewX(-18deg)}55%{transform:translateX(240%) skewX(-18deg)}100%{transform:translateX(240%) skewX(-18deg)}}
 .stats{display:flex;gap:clamp(22px,5vw,58px);margin-top:52px;flex-wrap:wrap}
 .stat .n{font-family:var(--grot);font-size:clamp(30px,4vw,44px);font-weight:700;color:var(--txt)}
 .stat .n em{font-style:normal;color:var(--gold)}
@@ -107,8 +108,9 @@ h1 .grad{background:linear-gradient(100deg,var(--gold2) 10%,#ffdf9e 45%,var(--go
 .lsn.current .node{border-color:var(--gold);color:var(--gold2);animation:pulse 2.2s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(227,168,43,.35)}50%{box-shadow:0 0 0 9px rgba(227,168,43,0)}}
 .card{position:relative;border-radius:16px;background:var(--panel);border:1px solid var(--line);padding:20px 22px;cursor:pointer;overflow:hidden;transition:transform .25s ease,border-color .25s,background .25s;will-change:transform}
-.glowfield{position:absolute;inset:0;background:radial-gradient(560px circle at var(--rgx,50%) var(--rgy,50%),rgba(245,198,92,.13),transparent 65%);opacity:0;transition:opacity .35s ease;pointer-events:none;z-index:2}
+.glowfield{position:absolute;inset:0;background:radial-gradient(560px circle at var(--rgx,50%) var(--rgy,50%),rgba(245,198,92,.16),transparent 65%);opacity:0;transition:opacity .35s ease;pointer-events:none;z-index:2}
 .lessons.lit .glowfield{opacity:1}
+.lessons:hover .glowfield{opacity:1}
 .card:hover::before{opacity:1}
 .card:hover{border-color:rgba(245,198,92,.4);background:var(--panel2)}
 .card .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -561,7 +563,7 @@ function bindCards(){
   });
 }
 /* ---------- route light field: one shared glow per stage list ---------- */
-(function(){ const wrap=$('#stages'); if(!wrap||reduced||!matchMedia('(hover:hover)').matches) return; let curL=null;
+(function(){ const wrap=$('#stages'); if(!wrap) return; let curL=null;
   wrap.addEventListener('mousemove',e=>{ const L=e.target.closest?e.target.closest('.lessons'):null;
     if(curL&&curL!==L)curL.classList.remove('lit'); curL=L; if(!L)return;
     const r=L.getBoundingClientRect(); L.style.setProperty('--rgx',(e.clientX-r.left)+'px'); L.style.setProperty('--rgy',(e.clientY-r.top)+'px'); L.classList.add('lit'); },{passive:true});
