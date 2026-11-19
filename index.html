@@ -197,6 +197,43 @@ h1 .grad{background:linear-gradient(100deg,var(--gold2) 10%,#ffdf9e 45%,var(--go
 .why.show{display:block}
 .quiz-foot{display:flex;gap:12px;margin-top:22px;align-items:center;flex-wrap:wrap}
 .score{font-family:var(--grot);color:var(--muted);font-size:14px}
+.fig-media{margin:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0a0d12}
+.fig-media img{display:block;width:100%;height:auto}
+.fig-media figcaption{font-size:13px;line-height:1.7;color:var(--muted);padding:10px 16px;border-top:1px solid var(--line)}
+.trace{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px 18px;margin-bottom:14px}
+.trace-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.trace-title{font-family:var(--serif);font-weight:900;font-size:16.5px;color:var(--txt)}
+.trace-step-n{font-family:var(--grot);font-size:12px;color:var(--muted)}
+.trace-bar{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:10px}
+.trace-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px;transition:width .5s cubic-bezier(.22,1,.36,1)}
+.trace-grid{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:12px;margin-top:12px}
+@media(max-width:640px){.trace-grid{grid-template-columns:1fr}}
+.trace-code{background:#0a0d12;border:1px solid var(--line);border-radius:10px;padding:10px 0;font-family:var(--mono);font-size:13.5px;line-height:1.8;overflow-x:auto}
+.trace-line{display:flex;align-items:center;gap:10px;padding:3px 14px;color:#9aa3ad;white-space:nowrap}
+.trace-line .no{width:18px;flex:none;text-align:right;font-size:11.5px;color:var(--muted2)}
+.trace-line .tl-code{white-space:pre}
+.trace-line.on{background:rgba(227,168,43,.16);color:#f2efe7}
+.trace-line.on .no{color:var(--gold2)}
+.trace-line .cur{margin-left:auto;flex:none;font-size:11px;color:var(--gold2);font-family:var(--sans)}
+.trace-out{border-top:1px dashed var(--line);margin-top:8px;padding:9px 14px 4px;color:#b9f0cf;font-size:13.5px;line-height:1.8}
+.trace-out .hd{color:var(--muted2);font-size:10.5px;letter-spacing:.24em;margin-bottom:2px;font-family:var(--sans)}
+.trace-out .none{color:var(--muted2);font-family:var(--sans);font-size:12.5px}
+.trace-vars{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.trace-vars .tv-hd{font-size:11px;letter-spacing:.18em;color:var(--muted);margin-bottom:9px}
+.tv-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:13px;color:#d8d5cc;padding:5px 9px;border-radius:7px;background:rgba(255,255,255,.04);margin-bottom:6px}
+.tv-row b{color:var(--txt)}
+.tv-row.chg{background:rgba(227,168,43,.15)}
+.tv-row.chg b{color:var(--gold2)}
+.tv-none{font-size:12.5px;line-height:1.7;color:var(--muted);margin:0}
+.trace-note{font-size:14.5px;line-height:1.85;color:#d8d5cc;min-height:27px;margin:12px 0 0}
+.trace-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.trace-btns .btn{padding:9px 18px;font-size:13.5px}
+.ex-ai{margin-top:20px;border-top:1px dashed var(--line);padding-top:14px}
+.ex-ai-t{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:99px;padding:8px 18px;font-family:var(--sans);font-size:13.5px;font-weight:700;cursor:pointer;transition:all .18s}
+.ex-ai-t:hover{border-color:rgba(245,198,92,.55);color:var(--gold2)}
+.ex-ai-t .ex-ar{font-size:11px;color:var(--gold2)}
+.ex-thread{max-height:320px;margin-top:12px}
+.ex-ai .ai-qrow{margin-top:10px}
 .sh-nav{display:flex;gap:12px;margin-top:34px;border-top:1px solid var(--line);padding-top:22px}
 .sh-nav .btn{padding:11px 24px;font-size:14px}
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,1.08,.36,1)}
@@ -492,7 +529,7 @@ function extrasHtml(l){
   const x=l.extras; if(!x||!x.table) return '';
   const head=x.table.head.map(h=>'<th>'+esc(h)+'</th>').join('');
   const rows=x.table.rows.map(r=>'<tr>'+r.map((c,j)=>'<td'+(j===0?' class="k"':'')+'>'+esc(c)+'</td>').join('')+'</tr>').join('');
-  return '<div class="sec-t">记忆要点</div>'
+  return '<div class="sec-t">要点速记</div>'
     +'<div class="mem-wrap"><table class="mem"><thead><tr>'+head+'</tr></thead><tbody>'+rows+'</tbody></table></div>'
     +'<div class="extra-t">'+esc(x.extra_title)+'</div><p class="extra-p">'+esc(x.extra)+'</p>';
 }
@@ -605,6 +642,124 @@ async function heroLoop(){
     await wait(3200);
   }
 }
+/* ---------- 看图学配图登记（与空间版 LESSON_MEDIA 同源，按 gi 顺序对齐） ---------- */
+const MEDIA=[
+["ide-hello.png", "PyCharm 里写下头两行 print：第一行输出文字「你好，Python」，第二行 print 里直接写算式 19.82 + 14.24，下方运行结果输出 34.06（图中箭头标出了要注意的地方）"],
+["ide-variables.png", "PyCharm 里写变量：lunch = 19.82、dinner = 14.24，total = lunch + dinner，下方运行结果输出 34.06"],
+["ide-operators.png", "PyCharm 里试三种容易混的运算：// 整除、% 取余数、** 幂，下方运行结果输出 3、1 和 1000（图中箭头标出了要注意的地方）"],
+["ide-strings.png", "PyCharm 里拼接字符串：用 + 把几段文字连成一句话，下方运行结果输出「今天吃牛肉饭」（图中箭头标出了要注意的地方）"],
+["ide-fstring.png", "PyCharm 里用 f-string 把价格嵌进文字：f\"牛肉饭：{price} 元\"，下方运行结果输出「牛肉饭：21.02 元」（图中箭头标出了要注意的地方）"],
+["ide-types.png", "PyCharm 里做类型转换：text = \"20.5\" 是字符串，price = float(text) 转成小数，下方运行结果输出 30.5 和 <class 'float'>"],
+["ide-input.png", "PyCharm 里用 input 提问：程序在控制台等你输入，输入 Hobart 后，下方运行结果输出「你好，Hobart」（图中箭头标出了要注意的地方）"],
+["ide-compare.png", "PyCharm 里做比较运算：比较的结果不是数字，而是 True 或 False，下方运行结果输出 True 和 True（图中箭头标出了要注意的地方）"],
+["ide-logic.png", "PyCharm 里用 and 组合条件：两个条件都成立结果才是 True，下方运行结果输出 True（图中箭头标出了要注意的地方）"],
+["ide-condition.png", "PyCharm 里写判断：score = 82，if score >= 60 成立，下方运行结果输出「及格」"],
+["ide-elif.png", "PyCharm 里写 elif 多分支：score = 75，从上往下逐个条件试，下方运行结果输出「及格」（图中箭头标出了要注意的地方）"],
+["ide-loop.png", "PyCharm 里写 for 循环：把 1 到 5 逐个累加进 total，下方运行结果输出 15"],
+["ide-while.png", "PyCharm 里写 while 循环倒数：n 从 3 开始，每轮先打印再减 1，减到 0 循环停下，下方运行结果输出 3、2、1 和「开始」（图中箭头标出了要注意的地方）"],
+["ide-list1.png", "PyCharm 里建价格列表：prices 里按顺序放三笔金额，prices[0] 取第一笔、len(prices) 数一共有几笔，下方运行结果输出 19.82 和 3（图中箭头标出了要注意的地方）"],
+["ide-list2.png", "PyCharm 里给列表加工：先 append 追加一笔，再 sort 从小到大排序，下方运行结果输出 [14.24, 19.82, 21.02]（图中箭头标出了要注意的地方）"],
+["ide-dictionary.png", "PyCharm 里用字典存一餐：meal = {\"name\": \"牛肉饭\", \"price\": 21.02}，用键取值，下方运行结果输出 牛肉饭 和 21.02"],
+["ide-function.png", "PyCharm 里定义函数：def total(a, b) 用 return 返回 a + b，调用 total(19.82, 14.24)，下方运行结果输出 34.06"],
+["ide-function2.png", "PyCharm 里用 return 交结果：def pay(amount, count) 返回 amount * count，调用 pay(21.02, 2)，下方运行结果输出 42.04"],
+["ide-ledger.png", "PyCharm 里把记账本拼起来：逐笔记录三餐金额再汇总，下方运行结果输出共 3 笔、总支出 55.08 元（图中箭头标出了要注意的地方）"],
+["ide-strmethods.png", "PyCharm 里拆一行记录：用 split 按逗号把「午餐,19.82」拆成两段，下方运行结果输出 午餐 和 19.82（图中箭头标出了要注意的地方）"],
+["ide-files.png", "PyCharm 里把内容存进文件：打开 note.txt 写入一句话再关好，下方运行结果输出「已保存」（图中箭头标出了要注意的地方）"],
+["ide-errors.png", "PyCharm 里接住报错：float(\"abc\") 本来会让程序崩掉，放进 try 后被 except 接住，下方运行结果输出「这不是数字」（图中箭头标出了要注意的地方）"],
+["ide-stdlib.png", "PyCharm 里用标准库看日期：取出 2026-11-18 这一天，再用 weekday() 看它是星期几，下方运行结果输出 2026-11-18 和 2（图中箭头标出了要注意的地方）"],
+["ide-csv.png", "PyCharm 里读 CSV：用 csv.reader 读 meals.csv，下方运行结果输出表头 ['日期', '项目', '金额'] 和总行数 4"],
+["ide-comprehension.png", "PyCharm 里一行筛出大额支出：用列表推导式只留大于 15 的金额，下方运行结果输出 [19.82, 21.02]（图中箭头标出了要注意的地方）"],
+["ide-survey.png", "PyCharm 里统计问卷：数出回收份数，再算满意人数占比，下方运行结果输出 63 和 66.7（即 63 份里满意占 66.7%）（图中箭头标出了要注意的地方）"],
+["ide-pandas.png", "PyCharm 里用 pandas 读表：df = pd.read_csv(\"meals.csv\")（沿用第 24 课的文件），df[\"金额\"].sum() 下方运行结果输出 55.08"],
+["ide-groupby.png", "PyCharm 里按项目汇总（沿用 meals.csv）：用 groupby 把同一项目的金额加在一起，下方运行结果输出 午餐 19.82、晚餐 14.24、牛肉饭 21.02（图中箭头标出了要注意的地方）"],
+["ide-chart.png", "PyCharm 里画柱状图：把几笔支出画成 bar 图并存成 chart.png，下方运行结果输出「图表已保存」（图中箭头标出了要注意的地方）"],
+["ide-report.png", "PyCharm 里生成账本报告：汇总全部支出并找出最贵的一笔，下方运行结果输出总支出 55.08、最贵一笔 21.02（图中箭头标出了要注意的地方）"],
+["ide-pathlib.png", "PyCharm 里拆文件名：Path(\"账单.xlsx\") 的 suffix 是 .xlsx、stem 是 账单，下方运行结果依次输出 .xlsx 和 账单（图中箭头标出了要注意的地方）"],
+["ide-openpyxl.png", "PyCharm 里写 Excel 成绩表：Workbook 建表、append 逐行写入表头和成绩、save 保存，下方运行结果输出「成绩表已保存」（图中箭头标出了要注意的地方）"],
+["ide-pivot.png", "PyCharm 里做透视表：pivot_table 按类别汇总金额，aggfunc 显式写 \"sum\"，下方运行结果输出食类合计 55.08（图中箭头标出了要注意的地方）"],
+["ide-cleaning.png", "PyCharm 里清洗问卷数据：drop_duplicates 去掉重复提交，to_numeric(errors=\"coerce\") 把转不了的值变 NaN，下方运行结果输出 2 和 90.0（图中箭头标出了要注意的地方）"],
+["ide-subplots.png", "PyCharm 里一图两格：subplots(1, 2) 左格柱状图、右格折线图，savefig 保存，下方运行结果输出「图表已保存」（图中箭头标出了要注意的地方）"],
+["ide-annual.png", "PyCharm 里算账本月度合计：给表加一列 total = food + transport，再对 total 求和，下方运行结果输出 1745（示例为三个月数据）（图中箭头标出了要注意的地方）"],
+["ide-httpjson.png", "PyCharm 里解析 JSON：json.loads 把 JSON 文本变回字典，再按 key 取出城市和温度，下方运行结果输出 广州 24.5（图中箭头标出了要注意的地方）"],
+["ide-requests.png", "PyCharm 里发真实请求：requests.get 拿到公开测试 API 的响应，先看状态码 200，再用 .json() 取出标题，下方运行结果输出 200 和 delectus aut autem（图中箭头标出了要注意的地方）"],
+["ide-soup.png", "PyCharm 里解析公告页：BeautifulSoup 用 find_all 找出全部链接，下方运行结果输出 2 和第一条通知的标题（图中箭头标出了要注意的地方）"],
+["ide-selectors.png", "PyCharm 里按 class 批量提取价格：select(\".item\") 逐个容器取 .price，去掉 ¥ 再 float 累加，下方运行结果输出 29.5（图中箭头标出了要注意的地方）"],
+["ide-crawler.png", "PyCharm 里把公告整理成表：逐条提取日期和标题，DataFrame 成表后 to_csv 存档，下方运行结果输出 1（示例 1 条）（图中箭头标出了要注意的地方）"],
+];
+function escA(s){ return esc(s).replace(/"/g,'&quot;'); }
+function mediaHtml(l){
+  const m=MEDIA[l.gi]; if(!m) return '';
+  return `<div class="sec-t">看图学</div><figure class="fig-media"><img src="assets/lessons/${m[0]}" width="1280" height="800" loading="lazy" alt="${escA(m[1])}"><figcaption>${esc(m[1])}</figcaption></figure>`;
+}
+/* ---------- 代码逐步执行演示（与空间版 LESSON_TRACES 同一份数据，按 gi 对齐） ---------- */
+const TRACES={
+1:[{"title":"记账：三行赋值加一行打印","code":["lunch = 19.82","dinner = 14.24","total = lunch + dinner","print(total)"],"steps":[
+{"line":0,"vars":[["lunch","19.82"]],"output":[],"note":"执行第 1 行：把 19.82 存进变量 lunch，等于给格子贴上名字、放进值。"},
+{"line":1,"vars":[["lunch","19.82"],["dinner","14.24"]],"output":[],"note":"执行第 2 行：把 14.24 存进变量 dinner。两个变量互不干扰。"},
+{"line":2,"vars":[["lunch","19.82"],["dinner","14.24"],["total","34.06"]],"output":[],"note":"执行第 3 行：先算右边 lunch + dinner = 19.82 + 14.24 = 34.06，再把结果存进 total。"},
+{"line":3,"vars":[["lunch","19.82"],["dinner","14.24"],["total","34.06"]],"output":["34.06"],"note":"执行第 4 行：print 把 total 的值显示出来——34.06。这就是你每天记账时程序在做的事。"}]}],
+11:[{"title":"for 循环：依次打印 0、1、2","code":["for i in range(3):","    print(i)"],"steps":[
+{"line":0,"vars":[["i","0"]],"output":[],"note":"第 1 轮开始：range(3) 先给出 0，存进 i。条件成立，进入循环体。"},
+{"line":1,"vars":[["i","0"]],"output":["0"],"note":"执行循环体：打印 i，现在是 0。打完回到循环开头。"},
+{"line":0,"vars":[["i","1"]],"output":["0"],"note":"第 2 轮：range 给出下一个数 1，i 更新为 1。"},
+{"line":1,"vars":[["i","1"]],"output":["0","1"],"note":"打印 1，再回到开头。"},
+{"line":0,"vars":[["i","2"]],"output":["0","1"],"note":"第 3 轮：range 给出 2，i 更新为 2。"},
+{"line":1,"vars":[["i","2"]],"output":["0","1","2"],"note":"打印 2。range 的数已经用完，没有下一个了，循环结束。"}]},
+{"title":"累加求和：1 + 2 + 3 + 4 + 5","code":["s = 0","for i in range(1, 6):","    s = s + i","print(s)"],"steps":[
+{"line":0,"vars":[["s","0"]],"output":[],"note":"先准备一个「累加器」s，从 0 开始——等下每轮都把新数加进去。"},
+{"line":1,"vars":[["s","0"],["i","1"]],"output":[],"note":"第 1 轮：range(1, 6) 先给出 1，i = 1（注意：range 不包含终点 6）。"},
+{"line":2,"vars":[["s","1"],["i","1"]],"output":[],"note":"s = s + i：先算右边 0 + 1 = 1，再存回 s。s 变成 1。"},
+{"line":1,"vars":[["s","1"],["i","2"]],"output":[],"note":"第 2 轮：i = 2。"},
+{"line":2,"vars":[["s","3"],["i","2"]],"output":[],"note":"s = 1 + 2 = 3。"},
+{"line":1,"vars":[["s","3"],["i","3"]],"output":[],"note":"第 3 轮：i = 3。"},
+{"line":2,"vars":[["s","6"],["i","3"]],"output":[],"note":"s = 3 + 3 = 6。"},
+{"line":1,"vars":[["s","6"],["i","4"]],"output":[],"note":"第 4 轮：i = 4。"},
+{"line":2,"vars":[["s","10"],["i","4"]],"output":[],"note":"s = 6 + 4 = 10。"},
+{"line":1,"vars":[["s","10"],["i","5"]],"output":[],"note":"第 5 轮：i = 5，这是最后一个数。"},
+{"line":2,"vars":[["s","15"],["i","5"]],"output":[],"note":"s = 10 + 5 = 15。没有下一个数了，跳出循环。"},
+{"line":3,"vars":[["s","15"],["i","5"]],"output":["15"],"note":"执行循环外面的 print(s)，输出 15。求和、求平均、统计总数都是这个套路。"}]}]
+};
+function tracesHtml(l){
+  const ts=TRACES[l.gi]; if(!ts||!ts.length) return '';
+  return '<div class="sec-t">看代码一步步运行</div>'+ts.map((t,ti)=>`<div class="trace" data-trace="${ti}"></div>`).join('');
+}
+function wireTrace(el){
+  const t=(TRACES[LESSONS[cur].gi]||[])[+el.dataset.trace]; if(!t) return;
+  const total=t.steps.length, st={idx:-1, playing:false, timer:null};
+  const stop=()=>{ st.playing=false; if(st.timer){ clearInterval(st.timer); st.timer=null; } };
+  function paint(){
+    const idx=st.idx, cs=idx>=0?t.steps[idx]:null, ps=idx>0?t.steps[idx-1]:null;
+    const prevVars={}; if(ps) ps.vars.forEach(([k,v])=>{ prevVars[k]=v; });
+    const lines=t.code.map((ln,i)=>`<div class="trace-line${cs&&cs.line===i?' on':''}"><span class="no">${i+1}</span><span class="tl-code">${hl(ln)}</span>${cs&&cs.line===i?'<span class="cur">◀ 正在执行</span>':''}</div>`).join('');
+    const outs=cs&&cs.output.length? cs.output.map(o=>`<div>${esc(o)}</div>`).join('') : '<div class="none">（还没有输出）</div>';
+    const vars=cs? cs.vars.map(([k,v])=>`<div class="tv-row${prevVars[k]!==v?' chg':''}"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('') : '<p class="tv-none">还没开始运行，变量都还不存在。点「播放」或「单步」开始。</p>';
+    el.innerHTML=`
+     <div class="trace-head"><span class="trace-title">${esc(t.title)}</span><span class="trace-step-n">${idx<0?('共 '+total+' 步'):('第 '+(idx+1)+' / '+total+' 步')}</span></div>
+     <div class="trace-bar"><i style="width:${((idx+1)/total)*100}%"></i></div>
+     <div class="trace-grid"><div class="trace-code">${lines}<div class="trace-out"><div class="hd">输出</div>${outs}</div></div>
+     <div class="trace-vars"><div class="tv-hd">变量现在的值</div>${vars}</div></div>
+     <p class="trace-note">${cs?esc(cs.note):'准备好了吗？跟着一步步看代码是怎么运行的。'}</p>
+     <div class="trace-btns">
+       <button class="btn btn-gold tp-play">${st.playing?'⏸ 暂停':(idx>=total-1?'↻ 再看一遍':(idx<0?'▶ 播放':'▶ 继续'))}</button>
+       <button class="btn btn-ghost tp-next" ${idx>=total-1?'disabled style="opacity:.4"':''}>单步 →</button>
+       <button class="btn btn-ghost tp-prev" ${idx<0?'disabled style="opacity:.4"':''}>← 上一步</button>
+       <button class="btn btn-ghost tp-reset" ${idx<0?'disabled style="opacity:.4"':''}>重新开始</button>
+     </div>`;
+    el.querySelector('.tp-play').onclick=()=>{
+      if(st.playing){ stop(); paint(); return; }
+      if(st.idx>=total-1) st.idx=-1;
+      st.playing=true; paint();
+      st.timer=setInterval(()=>{ if(!el.isConnected){ stop(); return; }
+        if(st.idx<total-1) st.idx++;
+        if(st.idx>=total-1){ stop(); }
+        paint(); },1300);
+    };
+    el.querySelector('.tp-next').onclick=()=>{ stop(); if(st.idx<total-1) st.idx++; paint(); };
+    el.querySelector('.tp-prev').onclick=()=>{ stop(); if(st.idx>-1) st.idx--; paint(); };
+    el.querySelector('.tp-reset').onclick=()=>{ stop(); st.idx=-1; paint(); };
+  }
+  paint();
+}
 /* ---------- lesson sheet ---------- */
 let cur=-1, quizSel=[], quizPos=0, quizLock=false;
 const DIFF_LAB={1:'入门',2:'基础',3:'进阶',4:'挑战',5:'综合'};
@@ -615,6 +770,7 @@ function openLesson(i){
   $('#sheet').innerHTML=`
    <div class="sh-head"><div><div class="stg">阶段${st.medal} · ${stageName(st)} — LESSON ${l.gi+1} / ${LESSONS.length} · 难度 ${DIFF_LAB[l.diff]}${diffSeg(l.diff)}</div>
    <h3>${dispTitle(l)}</h3></div><button class="x" id="shClose" aria-label="关闭">✕</button></div>
+   ${mediaHtml(l)}
    <div class="sec-t">讲解</div>
    <div class="intro">${dispExplain(l)}</div>
    <div class="tip"><b>注意 ·</b> ${l.tip}</div>
@@ -623,6 +779,7 @@ function openLesson(i){
    <div class="codebox" id="demoBox"><div class="cb-bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="fn">demo.py</span><button class="runbtn" id="runBtn">▶ 运行演示</button></div>
    <pre id="demoCode">${hl(l.code)}</pre>
    <div class="console" id="demoCon"><div class="hd">运行结果</div><div id="demoOut"></div></div></div>
+   ${tracesHtml(l)}
    <div class="sec-t">互动练习 · ${l.quiz.length} 题</div>
    <div id="quizBox"></div>
    <div class="sec-t">动手写 · 即刻判定<label class="pref-t" title="打开课程时在后台提前加载 Python 运行环境，写代码时不用等冷启动"><input type="checkbox" id="prefHeat">预热运行环境</label></div>
@@ -648,6 +805,8 @@ function openLesson(i){
   const db=$('#demoBox');
   if(db && !reduced && 'IntersectionObserver' in window){ const dio=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.intersectionRatio>=0.5){ dio.disconnect(); const b=$('#runBtn'); if(b && !b.disabled && b.textContent.indexOf('再跑')<0) runDemo(); } }); },{threshold:[0.5]}); dio.observe(db); }
   renderQuiz(); renderCoding(); renderAiBox();
+  $$('#sheet .trace').forEach(wireTrace);
+  const nm=MEDIA[i+1]; if(nm){ try{ const pim=new Image(); pim.src='assets/lessons/'+nm[0]; }catch(e){} }
 }
 function closeLesson(){ $('#overlay').classList.remove('open'); document.body.style.overflow=''; renderRoute(); }
 $('#overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeLesson(); });
@@ -673,9 +832,11 @@ function renderQuiz(){
      return `<button class="opt ${cls}" data-k="${k}" ${sel!==null?'disabled':''}>${esc(o)}</button>`}).join('')}</div>
    <div class="why ${sel!==null?'show':''}">${sel!==null?('<b>'+(sel===q.ans?'✓ 答对了。':'✗ 答错了。')+'</b> '+q.why):''}</div>
    <div class="quiz-foot">${sel!==null?`<button class="btn btn-gold" id="qNext" style="padding:11px 26px;font-size:14px">${quizPos<l.quiz.length-1?'下一题 →':'查看结果'}</button>`:''}
-   <span class="score">已答 ${answered} / ${l.quiz.length}</span></div>`;
+   <span class="score">已答 ${answered} / ${l.quiz.length}</span></div>
+   ${exPanelSlot(exKeyQ(quizPos))}`;
   box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ if(quizLock)return; quizLock=true; quizSel[quizPos]=+b.dataset.k; setTimeout(()=>{quizLock=false; renderQuiz();},60); });
   const nx=$('#qNext'); if(nx) nx.onclick=()=>{ if(quizPos<l.quiz.length-1){quizPos++; renderQuiz();} else renderQuizResult(); };
+  mountExPanels(box);
 }
 function renderQuizResult(){
   const l=LESSONS[cur], score=quizSel.reduce((a,s,k)=>a+(s===l.quiz[k].ans?1:0),0);
@@ -829,6 +990,91 @@ async function askAI(q){
   if(settled&&acc){ chat.push({role:'assistant', content:acc}); saveChats(); if(mySeq===aiSeq) bub.innerHTML=fmtAi(acc); }
   if(mySeq===aiSeq){ aiAbort=null; if(stopBtn) stopBtn.style.display='none'; th.scrollTop=th.scrollHeight; }
 }
+/* ---------- per-exercise AI panels: a mini tutor under each question ---------- */
+const exOpen={}, exAbort={}, exSeq={};
+function exKeyQ(n){ return 'ex:'+LESSONS[cur].gi+'-q'+n; }
+function exPanelSlot(key){ return `<div class="ex-wrap" data-exkey="${key}"></div>`; }
+function exPanelHtml(key){
+  const chat=aiChats[key]||[], open=!!exOpen[key];
+  let body='';
+  if(open){
+    if(aiReady()){
+      body=`<div class="ai-thread ex-thread">${chat.length? chat.map(m=>bubbleHtml(m)).join('') : '<div class="msg a">这道题卡住了？我看得到题目、选项和你现在的作答。先说说你卡在哪一步，我给你提示和思路，不直接报答案。</div>'}</div>
+      <div class="ai-qrow"><input type="text" class="ex-q" placeholder="问这道题…（Enter 发送）"><button class="btn btn-gold ex-send" style="padding:10px 20px;font-size:13.5px">发送</button><button class="btn btn-ghost ex-stop" style="padding:10px 16px;font-size:13.5px;${exAbort[key]?'':'display:none'}">停止</button></div>`;
+    } else {
+      body=`<div class="why show" style="margin-top:12px">想让 AI 针对这一道题给你讲解，先接入你自己的 AI（Key 只存在你自己的浏览器里）。</div>
+      <div class="quiz-foot" style="margin-top:12px"><button class="btn btn-gold ex-open-ai" style="padding:9px 22px;font-size:13.5px">接入我的 AI</button></div>`;
+    }
+  }
+  return `<div class="ex-ai"><button class="ex-ai-t">${open?'收起讲解':'召唤 AI 讲解这道题'}<span class="ex-ar">${open?'▴':'▾'}</span></button>${body}</div>`;
+}
+function mountExPanel(wrap){
+  const key=wrap.dataset.exkey; if(!key) return;
+  wrap.innerHTML=exPanelHtml(key);
+  const t=wrap.querySelector('.ex-ai-t');
+  if(t) t.onclick=()=>{ exOpen[key]=!exOpen[key]; if(!exOpen[key]&&exAbort[key]) exAbort[key].abort(); mountExPanel(wrap); };
+  const inp=wrap.querySelector('.ex-q'), sendBtn=wrap.querySelector('.ex-send');
+  if(inp&&sendBtn){ const send=()=>{ const v=inp.value.trim(); if(v){ inp.value=''; askExAI(key, v, wrap); } };
+    sendBtn.onclick=send; inp.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); }); }
+  const stopBtn=wrap.querySelector('.ex-stop'); if(stopBtn) stopBtn.onclick=()=>{ if(exAbort[key]) exAbort[key].abort(); };
+  const oa=wrap.querySelector('.ex-open-ai'); if(oa) oa.onclick=openAiModal;
+  const th=wrap.querySelector('.ex-thread'); if(th) th.scrollTop=th.scrollHeight;
+}
+function mountExPanels(box){ if(box) box.querySelectorAll('.ex-wrap').forEach(mountExPanel); }
+function exContextOf(key){
+  const l=LESSONS[cur], head='当前课程：第 '+(l.gi+1)+' 课《'+dispTitle(l)+'》';
+  if(key.slice(-5)==='-code'){
+    const c=l.coding; if(!c) return head;
+    const ed=$('#edCode'), code=ed?ed.value:(codeCache[l.gi]||'');
+    const j=lastJudge[l.gi];
+    return head+'\n这道题是动手编程题。\n任务：'+c.task+'\n【学生写的代码】\n'+(code||'（还没写）')+'\n【判定结果】'+(j||'学生还没点「运行并判定」，暂时没有判定结果。');
+  }
+  const n=+key.split('-q')[1], q=l.quiz[n]; if(!q) return head;
+  const sel=quizSel[n], L='ABCD';
+  return head+'\n这道题是选择题第 '+(n+1)+' 题。\n题目：'+q.q+'\n选项：\n'+q.opts.map((o,k)=>L[k]+'. '+o).join('\n')
+    +'\n正确答案：'+L[q.ans]+'. '+q.opts[q.ans]+(q.why?'\n题目解析：'+q.why:'')
+    +'\n【学生的作答】'+(sel===null||sel===undefined?'学生还没有作答。':('学生选了 '+L[sel]+'. '+q.opts[sel]+'，判定结果：'+(sel===q.ans?'答对了。':'答错了。')));
+}
+async function askExAI(key, q, wrap){
+  if(!aiReady()) return;
+  const chat=chatOf(key);
+  if(exAbort[key]) exAbort[key].abort();
+  const mySeq=(exSeq[key]=(exSeq[key]||0)+1);
+  chat.push({role:'user', content:q}); if(chat.length>40) chat.splice(0, chat.length-40); saveChats();
+  const th=wrap.querySelector('.ex-thread');
+  if(th){ th.insertAdjacentHTML('beforeend', bubbleHtml({role:'user',content:q})); th.scrollTop=th.scrollHeight; }
+  const bub=document.createElement('div'); bub.className='msg a'; bub.textContent='思考中…';
+  if(th){ th.appendChild(bub); th.scrollTop=th.scrollHeight; }
+  const stopBtn=wrap.querySelector('.ex-stop'); if(stopBtn) stopBtn.style.display='';
+  const sys='你是一位耐心的 Python 编程老师，正在辅导一位会计专业大一学生自学 Python。用简体中文、通俗易懂地讲解，多用生活例子（记账、金额、问卷）。学生问的是下面这一道练习题：不要直接给出选择题的答案，也不要给出动手题的完整代码，只给提示、思路和检查方法，引导他自己想出来、写出来。回答控制在 300 字以内，分段清晰。';
+  const msgs=[{role:'system',content:sys},{role:'system',content:exContextOf(key)}];
+  chat.slice(-12).forEach(m=>msgs.push({role:m.role, content:m.content}));
+  const ctrl=new AbortController(); exAbort[key]=ctrl;
+  let acc='', settled=false;
+  try{
+    const r=await fetch(aiCfg.base+'/chat/completions',{method:'POST', signal:ctrl.signal,
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiCfg.key},
+      body:JSON.stringify({model:aiCfg.model,temperature:0.7,stream:true,messages:msgs})});
+    if(!r.ok){ const j=await r.json().catch(()=>null); throw new Error('请求失败：'+((j&&j.error&&j.error.message)||('HTTP '+r.status))+'。请检查接口地址、Key 和模型名。'); }
+    const ct=(r.headers.get('content-type')||'');
+    if(ct.includes('text/event-stream')&&r.body&&r.body.getReader){
+      const reader=r.body.getReader(), dec=new TextDecoder(); let buf='';
+      while(true){ const rd=await reader.read(); if(rd.done) break;
+        buf+=dec.decode(rd.value,{stream:true});
+        let idx; while((idx=buf.indexOf('\n'))>=0){ const line=buf.slice(0,idx).trim(); buf=buf.slice(idx+1);
+          if(line.startsWith('data:')){ const data=line.slice(5).trim();
+            if(data&&data!=='[DONE]'){ try{ const jj=JSON.parse(data); const delta=jj.choices&&jj.choices[0]&&jj.choices[0].delta&&jj.choices[0].delta.content;
+              if(delta){ acc+=delta; if(mySeq===exSeq[key]&&bub.isConnected){ bub.innerHTML=fmtAi(acc); if(th&&th.isConnected) th.scrollTop=th.scrollHeight; } } }catch(e){} } } }
+      }
+    } else { const j=await r.json(); const t=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content; if(t) acc=t; }
+    settled=true;
+  }catch(err){
+    if(err&&err.name==='AbortError'){ if(acc){ acc+='\n\n（已被打断）'; settled=true; } else if(mySeq===exSeq[key]&&bub.isConnected){ bub.textContent='（已停止生成）'; } }
+    else { if(mySeq===exSeq[key]&&bub.isConnected){ bub.classList.add('err'); bub.textContent=(err&&err.message?err.message:'请求没有发出去：可能是网络问题，或者该接口不允许浏览器直接调用（跨域限制）。')+'这条不计入对话，可以直接重发。'; } chat.pop(); saveChats(); }
+  }
+  if(settled&&acc){ chat.push({role:'assistant', content:acc}); saveChats(); if(mySeq===exSeq[key]&&bub.isConnected) bub.innerHTML=fmtAi(acc); }
+  if(mySeq===exSeq[key]){ exAbort[key]=null; const sb=wrap.querySelector('.ex-stop'); if(sb) sb.style.display='none'; }
+}
 /* ---------- hands-on judge: real Python in the browser (Pyodide) ---------- */
 store.codeDone=store.codeDone||[];
 let pyWorker=null, pySeq=0, pyWarm=false; const pyPending={};
@@ -906,7 +1152,8 @@ function renderCoding(){
      <button class="btn btn-ghost" id="resetCode" style="padding:12px 22px;font-size:14px">重置代码</button>
      <span class="score">代码会在你的浏览器里真的运行，再逐行和标准输出对比，错在哪一行直接标出来。</span>
    </div>
-   <div class="code-fb" id="codeFb"></div>`;
+   <div class="code-fb" id="codeFb"></div>
+   ${exPanelSlot('ex:'+l.gi+'-code')}`;
   const ta=$('#edCode'), gut=$('#edGutter');
   const syncGutter=(errLine)=>{ const n=ta.value.split('\n').length;
     gut.innerHTML=Array.from({length:n},(_,k)=>`<div class="${errLine===k+1?'err-line':''}">${k+1}</div>`).join(''); gut.scrollTop=ta.scrollTop; };
@@ -917,6 +1164,7 @@ function renderCoding(){
   syncGutter(0);
   $('#resetCode').onclick=()=>{ ta.value=c.starter; const fb=$('#codeFb'); fb.className='code-fb'; fb.innerHTML=''; syncGutter(0); };
   $('#runJudge').onclick=()=>judgeCode(syncGutter);
+  mountExPanels(box);
 }
 async function judgeCode(syncGutter){
   const l=LESSONS[cur], c=l.coding, fb=$('#codeFb'), btn=$('#runJudge');
